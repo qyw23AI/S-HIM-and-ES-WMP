@@ -1,0 +1,160 @@
+{
+  "status": "passed",
+  "method": "s-him",
+  "mode": "train",
+  "action_shape": [
+    4,
+    12
+  ],
+  "dt": 0.02,
+  "arguments": {
+    "method": "s-him",
+    "rma_phase": "joint",
+    "success_distance_m": null,
+    "num_envs": 4,
+    "iterations": 3,
+    "steps": 16,
+    "seed": 1,
+    "terrain": "flat",
+    "normalization": "care",
+    "swap_weight": 1.0,
+    "history": 5,
+    "estimator_width": 64,
+    "estimator_layers": 2,
+    "population": 5,
+    "estimator": "grsn",
+    "grsn_threshold": 1.0,
+    "grsn_bias": 1.45,
+    "grsn_diagnostics": true,
+    "legacy_actor_projection": false,
+    "imu_noise": 0.0,
+    "impulse": 0.0,
+    "impulse_step": 5,
+    "calibration_interval": 1,
+    "checkpoint": null,
+    "eval": false,
+    "energy": false,
+    "out": "/home/qyw/Graduation project/artifacts/p0-validation/shim-bias",
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "results": [
+    {
+      "iteration": 1,
+      "mean_reward": -0.06043744832277298,
+      "resets": 0,
+      "tracking_rmse_mps": 0.8811679482460022,
+      "mean_forward_displacement_m": -0.09168560802936554,
+      "impulses_per_env": 0,
+      "velocity_loss": 1.5176277160644531,
+      "swap_loss": 5.630723476409912,
+      "auxiliary_loss": 7.148351192474365,
+      "ppo_loss": -0.03632757067680359,
+      "grsn_layers": [
+        {
+          "layer": 0,
+          "threshold": 1.0,
+          "firing_rate": 0.45488283038139343,
+          "membrane_p05_p50_p95": [
+            0.47437527775764465,
+            0.9624005556106567,
+            1.4862622022628784
+          ]
+        },
+        {
+          "layer": 1,
+          "threshold": 1.0,
+          "firing_rate": 0.47041016817092896,
+          "membrane_p05_p50_p95": [
+            0.4547266960144043,
+            0.9747598767280579,
+            1.5242911577224731
+          ]
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "mean_reward": -0.051611997187137604,
+      "resets": 0,
+      "tracking_rmse_mps": 1.0787142515182495,
+      "mean_forward_displacement_m": -0.13814708590507507,
+      "impulses_per_env": 0,
+      "velocity_loss": 0.9076330661773682,
+      "swap_loss": 5.635202407836914,
+      "auxiliary_loss": 6.542835235595703,
+      "ppo_loss": -0.11359123885631561,
+      "grsn_layers": [
+        {
+          "layer": 0,
+          "threshold": 1.0,
+          "firing_rate": 0.4583984315395355,
+          "membrane_p05_p50_p95": [
+            0.4676506221294403,
+            0.9671211242675781,
+            1.4857749938964844
+          ]
+        },
+        {
+          "layer": 1,
+          "threshold": 1.0,
+          "firing_rate": 0.4710937440395355,
+          "membrane_p05_p50_p95": [
+            0.4588530659675598,
+            0.9727256298065186,
+            1.5239413976669312
+          ]
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "mean_reward": -0.057099781930446625,
+      "resets": 0,
+      "tracking_rmse_mps": 0.9544572830200195,
+      "mean_forward_displacement_m": -0.1407291740179062,
+      "impulses_per_env": 0,
+      "velocity_loss": 0.789038360118866,
+      "swap_loss": 5.483206748962402,
+      "auxiliary_loss": 6.272244930267334,
+      "ppo_loss": -0.09601028263568878,
+      "grsn_layers": [
+        {
+          "layer": 0,
+          "threshold": 1.0,
+          "firing_rate": 0.45849609375,
+          "membrane_p05_p50_p95": [
+            0.4695155918598175,
+            0.9667567014694214,
+            1.4843207597732544
+          ]
+        },
+        {
+          "layer": 1,
+          "threshold": 1.0,
+          "firing_rate": 0.470458984375,
+          "membrane_p05_p50_p95": [
+            0.4590565264225006,
+            0.9728620052337646,
+            1.5205353498458862
+          ]
+        }
+      ],
+      "fusion_max_error": 0.0
+    }
+  ]
+}

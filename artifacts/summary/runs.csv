@@ -1,0 +1,6 @@
+purpose,method,seed,terrain,goal_distance_m,delay_frames,frame_stride,blur_pixels,pause_at,pause_steps,episode_seconds,num_envs,steps,successes,finished_episodes,censored_episodes,success_rate,tracking_rmse_mps,energy_pj_per_decision,source
+smoke,es-parkour,1,mixed,3.0,0,1,1,5,0,20,4,20,0,0,4,,0.39819526601740707,25072579.6,/home/qyw/Graduation project/artifacts/visual-eval/es-parkour/validation.json
+smoke,event-spiking-wmp,1,mixed,3.0,0,1,1,5,0,20,4,20,0,0,4,,0.43925974172505194,3019018.105,/home/qyw/Graduation project/artifacts/visual-eval/es-wmp/validation.json
+smoke,event-spiking-wmp,1,mixed,3.0,1,2,3,5,5,20,4,20,0,0,4,,0.45169016365514036,2909091.295,/home/qyw/Graduation project/artifacts/visual-eval/es-wmp-degraded/validation.json
+smoke,s-him,1,mixed,3.0,0,1,1,5,0,20,4,20,0,0,4,,0.453978870183196,224349.08,/home/qyw/Graduation project/artifacts/visual-eval/s-him/validation.json
+smoke,wmp,1,mixed,3.0,0,1,1,5,0,20,4,20,0,0,4,,0.2956091911754503,34394045.44,/home/qyw/Graduation project/artifacts/visual-eval/wmp-fp32/validation.json

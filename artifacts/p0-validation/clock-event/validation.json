@@ -1,0 +1,255 @@
+{
+  "status": "passed",
+  "protocol_version": 2,
+  "method": "event-spiking-wmp",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "parkour",
+  "num_envs": 4,
+  "steps": 26,
+  "goal_distance_m": 3.0,
+  "checkpoint": "artifacts/verified/es-wmp-fp32/student.pt",
+  "event_threshold": 0.08,
+  "flow_mode": "analytical",
+  "memory_control": "checkpoint",
+  "checkpoint_memory": "grsn",
+  "mask_events_on_pause": false,
+  "pause_trigger_distance_m": null,
+  "stop_speed_mps": null,
+  "delay_frames": 1,
+  "frame_stride": 2,
+  "camera_hz": 5.0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 20,
+  "mean_forward_progress_m": 0.008940145373344421,
+  "tracking_rmse_mps": 0.8143707329417404,
+  "successes": 0,
+  "finished_episodes": 0,
+  "success_rate": null,
+  "censored_episodes": 4,
+  "timeout_episodes": 0,
+  "falls": 0,
+  "active_event_pixels": 3195,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.026969432830810547,
+      "control_steps": 26,
+      "speed_sq_error": 17.203514099121094,
+      "speed_samples": 26
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairup",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0039634108543396,
+      "control_steps": 26,
+      "speed_sq_error": 19.503202438354492,
+      "speed_samples": 26
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "hurdle",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.004827737808227539,
+      "control_steps": 26,
+      "speed_sq_error": 15.722306251525879,
+      "speed_samples": 26
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "parkour",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 26,
+      "speed_sq_error": 16.543745040893555,
+      "speed_samples": 26
+    }
+  ],
+  "camera_clock": {
+    "control_dt_s": 0.02,
+    "native_depth_period_control_steps": 5,
+    "delivery_period_control_steps": 10,
+    "delay_unit": "delivered_samples",
+    "invalid_source_step": -1,
+    "teacher_depth_buffer_index": null,
+    "student_depth_buffer_index": -1,
+    "rssm_period_control_steps": null,
+    "teacher_depth_deliveries": [],
+    "student_event_deliveries": [
+      {
+        "control_step": 0,
+        "source_steps": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "control_step": 10,
+        "source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 20,
+        "source_steps": [
+          10,
+          10,
+          10,
+          10
+        ]
+      }
+    ],
+    "rssm_updates": []
+  },
+  "energy": {
+    "decisions": 104,
+    "policy_hz": 50.0,
+    "mac_per_decision": 190632.3076923077,
+    "ac_per_decision": 264260.3846153846,
+    "energy_pj_per_decision": 1114742.9615384615,
+    "synaptic_power_w": 5.573714807692307e-05,
+    "layers": {
+      "convs.0": {
+        "mac": 0,
+        "ac": 114112,
+        "spikes": 3195,
+        "sites": 98304,
+        "calls": 3,
+        "event_dense_mac": 3538944,
+        "input_firing_rate": 0.032501220703125
+      },
+      "convs.1": {
+        "mac": 0,
+        "ac": 10694976,
+        "spikes": 155033,
+        "sites": 196608,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.7885386149088541
+      },
+      "convs.2": {
+        "mac": 0,
+        "ac": 6842368,
+        "spikes": 51615,
+        "sites": 98304,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.525054931640625
+      },
+      "memory.projection": {
+        "mac": 1451008,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "memory.forget": {
+        "mac": 0,
+        "ac": 536704,
+        "spikes": 4193,
+        "sites": 13312,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.31497896634615385
+      },
+      "memory.input_gate": {
+        "mac": 0,
+        "ac": 536704,
+        "spikes": 4193,
+        "sites": 13312,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.31497896634615385
+      },
+      "world": {
+        "mac": 0,
+        "ac": 2202624,
+        "spikes": 4302,
+        "sites": 13312,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.3231670673076923
+      },
+      "actor.layers.0": {
+        "mac": 14829568,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.layers.1": {
+        "mac": 0,
+        "ac": 5665664,
+        "spikes": 44263,
+        "sites": 106496,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.4156306340144231
+      },
+      "actor.layers.2": {
+        "mac": 0,
+        "ac": 1004040,
+        "spikes": 16734,
+        "sites": 53248,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.3142653245192308
+      },
+      "actor.readout": {
+        "mac": 6240,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 190632.3076923077,
+      "ac_per_decision": 264260.3846153846,
+      "energy_pj_per_decision": 1114742.9615384615,
+      "synaptic_power_w": 5.573714807692307e-05
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 156604.0,
+      "ac_per_decision": 265357.6153846154,
+      "energy_pj_per_decision": 959200.2538461537,
+      "synaptic_power_w": 4.796001269230769e-05
+    }
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "params": {
+    "scale_xyz": [
+      1.21,
+      0.65,
+      1.21
+    ],
+    "time_stretch": 1.1,
+    "min_width_m": 0.145,
+    "target_joint_order": [
+      "RR",
+      "RL",
+      "FR",
+      "FL"
+    ]
+  },
+  "amp_loader_check": {
+    "num_motions": 4,
+    "observation_dim": 30,
+    "trajectory_lens_s": [
+      11.0,
+      11.0,
+      11.0,
+      11.0
+    ]
+  },
+  "dual_scene_xml": "/home/qyw/WMP/tmp/wblwbl_hop_review/dual_scene.xml",
+  "clips": [
+    {
+      "clip": "trot1",
+      "frames": 551,
+      "duration_s": 11.0,
+      "root_displacement_xy_m": [
+        4.7399338483810425,
+        0.15578039169311522
+      ],
+      "mean_lin_vel_x_m_s": 0.4313245375370008,
+      "root_z_range_m": [
+        0.371441012409466,
+        0.39309478002099735
+      ],
+      "target_foot_fit_p95_mm": 0.07221466672155173,
+      "target_foot_fit_max_mm": 0.08563373797233675,
+      "sole_min_m": 0.0009999999999999315,
+      "below_floor_frames": 0,
+      "swing_max_clearance_cm": 13.357430160461032,
+      "swing_p95_clearance_cm": 10.841755414149544,
+      "dominant_gait_freq_hz": 0.9981851179673321,
+      "airborne_frames_gt2cm": 0,
+      "airborne_peak_clearance_cm": 0.10274753196610337,
+      "airborne_median_az_m_s2": null,
+      "stance_foot_slip_mean_m_s": 0.066951639784908,
+      "knee_range_rad": [
+        -2.125954753479479,
+        -1.4502632062742717
+      ],
+      "joint_limit_margin_rad": {
+        "hip": 0.26045643375372823,
+        "thigh": 0.7899266075471076,
+        "calf": 0.649118756520521
+      },
+      "joint_vel_p99_rad_s": 4.050592221738045,
+      "joint_vel_max_rad_s": 5.1304513719217955,
+      "self_collision_frames": 0,
+      "source_a1_com_offset_mean_m": [
+        0.012731,
+        0.002186,
+        0.000515
+      ],
+      "source_a1_com_offset_std_m": 1.7850133337308584e-08,
+      "source_a1_sole_min_m": -0.00019662566101593879,
+      "source_a1_airborne_frames_gt2cm": 0,
+      "source_a1_airborne_peak_m": -1.6843055511899657e-05,
+      "source_file": "/home/qyw/WMP/datasets/mocap_motions/trot1.txt",
+      "source_sha256": "ba3667e7ce9b68a663478d557e7d65b7a035084e28bf9a12fad5a2261a322769"
+    },
+    {
+      "clip": "trot2",
+      "frames": 551,
+      "duration_s": 11.0,
+      "root_displacement_xy_m": [
+        9.646273045539855,
+        -0.06337701797485351
+      ],
+      "mean_lin_vel_x_m_s": 0.8772371605001326,
+      "root_z_range_m": [
+        0.37260954130695517,
+        0.3834673531277507
+      ],
+      "target_foot_fit_p95_mm": 0.08416960457408929,
+      "target_foot_fit_max_mm": 0.10007672436630448,
+      "sole_min_m": 0.0009999999999999315,
+      "below_floor_frames": 0,
+      "swing_max_clearance_cm": 15.863264555016027,
+      "swing_p95_clearance_cm": 12.544344944019295,
+      "dominant_gait_freq_hz": 1.5426497277676952,
+      "airborne_frames_gt2cm": 0,
+      "airborne_peak_clearance_cm": 0.21226775557450367,
+      "airborne_median_az_m_s2": null,
+      "stance_foot_slip_mean_m_s": 0.13001086147512023,
+      "knee_range_rad": [
+        -2.2203819035838097,
+        -1.434668456454658
+      ],
+      "joint_limit_margin_rad": {
+        "hip": 0.29216798652378684,
+        "thigh": 0.7911157299291733,
+        "calf": 0.5546916064161902
+      },
+      "joint_vel_p99_rad_s": 6.64842522411038,
+      "joint_vel_max_rad_s": 7.443812286239925,
+      "self_collision_frames": 0,
+      "source_a1_com_offset_mean_m": [
+        0.012731,
+        0.002186,
+        0.000515
+      ],
+      "source_a1_com_offset_std_m": 1.7478884440651477e-08,
+      "source_a1_sole_min_m": -0.00015727991496025315,
+      "source_a1_airborne_frames_gt2cm": 0,
+      "source_a1_airborne_peak_m": -1.8059224026822224e-05,
+      "source_file": "/home/qyw/WMP/datasets/mocap_motions/trot2.txt",
+      "source_sha256": "99d567f5c0b1dcb6c3e10310edddf2c8bbfb7d8560a2c0a672d613114dc5fafc"
+    },
+    {
+      "clip": "hop1",
+      "frames": 551,
+      "duration_s": 11.0,
+      "root_displacement_xy_m": [
+        9.352465720176696,
+        1.7199523591995238
+      ],
+      "mean_lin_vel_x_m_s": 0.857489432014784,
+      "root_z_range_m": [
+        0.3356030268165813,
+        0.48872944355757664
+      ],
+      "target_foot_fit_p95_mm": 4.543939391533511,
+      "target_foot_fit_max_mm": 6.30181528328528,
+      "sole_min_m": 0.000999999999999987,
+      "below_floor_frames": 0,
+      "swing_max_clearance_cm": 6.684903347182168,
+      "swing_p95_clearance_cm": 5.868104646355884,
+      "dominant_gait_freq_hz": 1.9963702359346642,
+      "airborne_frames_gt2cm": 137,
+      "airborne_peak_clearance_cm": 5.164041842148199,
+      "airborne_median_az_m_s2": -9.616547832421023,
+      "stance_foot_slip_mean_m_s": 0.14842920141639732,
+      "knee_range_rad": [
+        -1.9721527154659557,
+        -1.0466341589779402
+      ],
+      "joint_limit_margin_rad": {
+        "hip": 0.2018599055886877,
+        "thigh": 0.8259650329937223,
+        "calf": 0.8029207945340442
+      },
+      "joint_vel_p99_rad_s": 7.538425693575025,
+      "joint_vel_max_rad_s": 9.278906282714273,
+      "self_collision_frames": 0,
+      "source_a1_com_offset_mean_m": [
+        0.012731,
+        0.002186,
+        0.000515
+      ],
+      "source_a1_com_offset_std_m": 1.7687009292876095e-08,
+      "source_a1_sole_min_m": -0.00023189946816566318,
+      "source_a1_airborne_frames_gt2cm": 114,
+      "source_a1_airborne_peak_m": 0.0440045675911723,
+      "source_file": "/home/qyw/WMP/datasets/mocap_motions/hop1.txt",
+      "source_sha256": "63243064f853651f1f517fb090809c9f808367541915551b68a2fb133d82c4f2"
+    },
+    {
+      "clip": "hop2",
+      "frames": 551,
+      "duration_s": 11.0,
+      "root_displacement_xy_m": [
+        11.548625020980834,
+        2.4492940711975097
+      ],
+      "mean_lin_vel_x_m_s": 1.0669332786264243,
+      "root_z_range_m": [
+        0.33912032078037313,
+        0.5045313636386223
+      ],
+      "target_foot_fit_p95_mm": 5.934186303320019,
+      "target_foot_fit_max_mm": 7.899872484158665,
+      "sole_min_m": 0.000999999999999987,
+      "below_floor_frames": 0,
+      "swing_max_clearance_cm": 9.068823513716078,
+      "swing_p95_clearance_cm": 7.668352032640832,
+      "dominant_gait_freq_hz": 2.087114337568058,
+      "airborne_frames_gt2cm": 181,
+      "airborne_peak_clearance_cm": 6.877721527811899,
+      "airborne_median_az_m_s2": -9.749211429890824,
+      "stance_foot_slip_mean_m_s": 0.17072691042936347,
+      "knee_range_rad": [
+        -1.9510114990390435,
+        -0.9954357915395274
+      ],
+      "joint_limit_margin_rad": {
+        "hip": 0.196613736279186,
+        "thigh": 0.8497453303158509,
+        "calf": 0.8240620109609564
+      },
+      "joint_vel_p99_rad_s": 8.328721165961035,
+      "joint_vel_max_rad_s": 10.762643214154021,
+      "self_collision_frames": 0,
+      "source_a1_com_offset_mean_m": [
+        0.012731,
+        0.002186,
+        0.000515
+      ],
+      "source_a1_com_offset_std_m": 1.768628334131336e-08,
+      "source_a1_sole_min_m": -0.00022409684662190107,
+      "source_a1_airborne_frames_gt2cm": 160,
+      "source_a1_airborne_peak_m": 0.05808678341623881,
+      "source_file": "/home/qyw/WMP/datasets/mocap_motions/hop2.txt",
+      "source_sha256": "49b643df5afd13a54c056a12c36838e240e3a4f332b82a077a56f3e9717931af"
+    }
+  ]
+}

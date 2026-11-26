@@ -1,0 +1,16 @@
+{
+  "updates": [
+    {
+      "ppo_loss": -0.26877737045288086,
+      "mean_reward": 0.0
+    }
+  ],
+  "mode": "teacher",
+  "status": "passed",
+  "terrain": "parkour",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 8,
+  "policy_hz": 50.0,
+  "event_hz": 10.0
+}

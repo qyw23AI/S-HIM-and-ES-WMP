@@ -1,0 +1,25 @@
+{
+  "updates": [
+    {
+      "phase": "teacher_rollout",
+      "action_mse": 0.01697247475385666,
+      "yaw_mse": 0.15385782718658447
+    },
+    {
+      "phase": "student_rollout",
+      "action_mse": 0.010060079395771027,
+      "yaw_mse": 0.012916884385049343
+    }
+  ],
+  "resets": 0,
+  "event_frames": 16,
+  "spike_pixels": 1510,
+  "mode": "distill",
+  "status": "passed",
+  "terrain": "parkour",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 10,
+  "policy_hz": 50.0,
+  "event_hz": 10.0
+}

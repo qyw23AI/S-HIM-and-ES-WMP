@@ -1,0 +1,56 @@
+{
+  "actions": 12,
+  "teacher_latent": 512,
+  "teacher_iteration": 15000,
+  "checkpoint_verified": true,
+  "camera_hz": 10.0,
+  "policy_hz": 50.0,
+  "steps_per_update": 15,
+  "envs": 4,
+  "config": {
+    "proprio_dim": 45,
+    "latent_dim": 512,
+    "actions": 12,
+    "memory_width": 128,
+    "memory": "grsn",
+    "channels": [
+      16,
+      32,
+      64
+    ],
+    "normalization": "care"
+  },
+  "seed": 1,
+  "updates": [
+    {
+      "iteration": 1,
+      "phase": "teacher_rollout",
+      "action_mse": 1.3344672918319702,
+      "latent_mse": 0.06111544370651245,
+      "latent_cosine_distance": 1.0049346685409546,
+      "gradient_norm": 0.5382462739944458,
+      "visual_weight_max_change": 0.0009999275207519531,
+      "actor_weight_max_change": 0.0009999992325901985
+    },
+    {
+      "iteration": 2,
+      "phase": "student_rollout",
+      "action_mse": 0.7516403794288635,
+      "latent_mse": 0.08029499650001526,
+      "latent_cosine_distance": 0.9902148246765137,
+      "gradient_norm": 0.4351447820663452,
+      "visual_weight_max_change": 0.0010010749101638794,
+      "actor_weight_max_change": 0.0010013319551944733
+    }
+  ],
+  "action_path": "end-to-end",
+  "world_weight": 1.0,
+  "cosine_weight": 0.1,
+  "resets": 0,
+  "status": "passed",
+  "fusion_max_errors": [
+    0.0,
+    0.0,
+    2.175569534301758e-06
+  ]
+}

@@ -1,0 +1,484 @@
+{
+  "status": "passed",
+  "protocol_version": 2,
+  "method": "wmp",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "parkour",
+  "num_envs": 4,
+  "steps": 26,
+  "goal_distance_m": 3.0,
+  "checkpoint": "artifacts/teachers/wmp-a1-15000.pt",
+  "event_threshold": 0.08,
+  "flow_mode": "random",
+  "memory_control": "checkpoint",
+  "checkpoint_memory": null,
+  "mask_events_on_pause": false,
+  "pause_trigger_distance_m": null,
+  "stop_speed_mps": null,
+  "delay_frames": 1,
+  "frame_stride": 2,
+  "camera_hz": 5.0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 20,
+  "mean_forward_progress_m": 0.268268421292305,
+  "tracking_rmse_mps": 0.42622707773003393,
+  "successes": 0,
+  "finished_episodes": 0,
+  "success_rate": null,
+  "censored_episodes": 4,
+  "timeout_episodes": 0,
+  "falls": 0,
+  "active_event_pixels": 0,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.17722028493881226,
+      "control_steps": 26,
+      "speed_sq_error": 6.866186141967773,
+      "speed_samples": 26
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairup",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.14940768480300903,
+      "control_steps": 26,
+      "speed_sq_error": 8.584545135498047,
+      "speed_samples": 26
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "hurdle",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.4044545292854309,
+      "control_steps": 26,
+      "speed_sq_error": 2.8132684230804443,
+      "speed_samples": 26
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "parkour",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.3419911861419678,
+      "control_steps": 26,
+      "speed_sq_error": 0.6296305656433105,
+      "speed_samples": 26
+    }
+  ],
+  "camera_clock": {
+    "control_dt_s": 0.02,
+    "native_depth_period_control_steps": 5,
+    "delivery_period_control_steps": 10,
+    "delay_unit": "delivered_samples",
+    "invalid_source_step": -1,
+    "teacher_depth_buffer_index": -2,
+    "student_depth_buffer_index": null,
+    "rssm_period_control_steps": 5,
+    "teacher_depth_deliveries": [
+      {
+        "control_step": 0,
+        "source_steps": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "control_step": 10,
+        "source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 20,
+        "source_steps": [
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    ],
+    "student_event_deliveries": [],
+    "rssm_updates": [
+      {
+        "control_step": 0,
+        "teacher_depth_source_steps": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "control_step": 5,
+        "teacher_depth_source_steps": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      {
+        "control_step": 10,
+        "teacher_depth_source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 15,
+        "teacher_depth_source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 20,
+        "teacher_depth_source_steps": [
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      {
+        "control_step": 25,
+        "teacher_depth_source_steps": [
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    ]
+  },
+  "energy": {
+    "decisions": 104,
+    "policy_hz": 50.0,
+    "mac_per_decision": 8582980.923076924,
+    "ac_per_decision": 0.0,
+    "energy_pj_per_decision": 39481712.24615385,
+    "synaptic_power_w": 0.0019740856123076924,
+    "layers": {
+      "world.encoder._cnn.layers.0": {
+        "mac": 12582912,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.3": {
+        "mac": 201326592,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.6": {
+        "mac": 201326592,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.9": {
+        "mac": 201326592,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear0": {
+        "mac": 811008,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear1": {
+        "mac": 25165824,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear2": {
+        "mac": 25165824,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear3": {
+        "mac": 25165824,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear4": {
+        "mac": 25165824,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_out_layers.0": {
+        "mac": 7340032,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 7,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._imgs_stat_layer": {
+        "mac": 14680064,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 7,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_in_layers.0": {
+        "mac": 13320192,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._cell.layers.GRU_linear": {
+        "mac": 37748736,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_out_layers.0": {
+        "mac": 69206016,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_stat_layer": {
+        "mac": 12582912,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 6,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.0": {
+        "mac": 5591040,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.2": {
+        "mac": 3407872,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.4": {
+        "mac": 465920,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.0": {
+        "mac": 3407872,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.2": {
+        "mac": 425984,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.4": {
+        "mac": 212992,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.0": {
+        "mac": 1863680,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.2": {
+        "mac": 3407872,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.4": {
+        "mac": 851968,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.6": {
+        "mac": 79872,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 8582980.923076924,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 39481712.24615385,
+      "synaptic_power_w": 0.0019740856123076924
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 8582980.923076924,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 39481712.24615385,
+      "synaptic_power_w": 0.0019740856123076924
+    },
+    "subsystems": {
+      "policy": {
+        "mac_per_decision": 189568.0,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 872012.7999999999,
+        "synaptic_power_w": 4.360064e-05
+      },
+      "cnn": {
+        "mac_per_decision": 5928487.384615385,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 27271041.969230767,
+        "synaptic_power_w": 0.0013635520984615383
+      },
+      "prop_mlp": {
+        "mac_per_decision": 975714.4615384615,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 4488286.523076923,
+        "synaptic_power_w": 0.00022441432615384613
+      },
+      "rssm": {
+        "mac_per_decision": 1489211.076923077,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 6850370.953846154,
+        "synaptic_power_w": 0.00034251854769230773
+      }
+    },
+    "scope": "policy_and_world_model",
+    "world_model_hz": 10.0,
+    "world_updates": {
+      "startup": {
+        "batches": 1,
+        "frames": 4,
+        "reset_frames": 4,
+        "mac": 148107264
+      },
+      "reset_batch": {
+        "batches": 0,
+        "frames": 0,
+        "reset_frames": 0,
+        "mac": 0
+      },
+      "steady": {
+        "batches": 5,
+        "frames": 20,
+        "reset_frames": 0,
+        "mac": 724807680
+      }
+    }
+  }
+}

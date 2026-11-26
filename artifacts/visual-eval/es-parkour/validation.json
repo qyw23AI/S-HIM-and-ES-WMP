@@ -1,0 +1,266 @@
+{
+  "status": "passed",
+  "method": "es-parkour",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "mixed",
+  "num_envs": 4,
+  "steps": 20,
+  "goal_distance_m": 3.0,
+  "checkpoint": "artifacts/verified/es-distill-soft/student.pt",
+  "delay_frames": 0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 20,
+  "mean_forward_progress_m": 0.01162034273147583,
+  "tracking_rmse_mps": 0.39819526601740707,
+  "successes": 0,
+  "finished_episodes": 0,
+  "success_rate": null,
+  "censored_episodes": 4,
+  "falls": 0,
+  "active_event_pixels": 1621,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "slope",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.029832124710083008,
+      "speed_sq_error": 4.285708904266357,
+      "speed_samples": 20
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairdown",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.004949092864990234,
+      "speed_sq_error": 4.639678955078125,
+      "speed_samples": 20
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.011700153350830078,
+      "speed_sq_error": 0.7439063787460327,
+      "speed_samples": 20
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "pit",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 3.015463352203369,
+      "speed_samples": 20
+    }
+  ],
+  "energy": {
+    "decisions": 80,
+    "policy_hz": 50.0,
+    "mac_per_decision": 5385126.4,
+    "ac_per_decision": 334442.4,
+    "energy_pj_per_decision": 25072579.6,
+    "synaptic_power_w": 0.0012536289799999999,
+    "layers": {
+      "stem": {
+        "mac": 411041792,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "blocks.0.first": {
+        "mac": 0,
+        "ac": 13761792,
+        "spikes": 25965,
+        "sites": 1048576,
+        "input_firing_rate": 0.02476215362548828
+      },
+      "blocks.0.second": {
+        "mac": 0,
+        "ac": 1068864,
+        "spikes": 2100,
+        "sites": 1048576,
+        "input_firing_rate": 0.002002716064453125
+      },
+      "blocks.1.first": {
+        "mac": 0,
+        "ac": 8551232,
+        "spikes": 16237,
+        "sites": 1048576,
+        "input_firing_rate": 0.015484809875488281
+      },
+      "blocks.1.second": {
+        "mac": 0,
+        "ac": 265024,
+        "spikes": 552,
+        "sites": 1048576,
+        "input_firing_rate": 0.00052642822265625
+      },
+      "blocks.2.first": {
+        "mac": 0,
+        "ac": 2606336,
+        "spikes": 10012,
+        "sites": 1048576,
+        "input_firing_rate": 0.009548187255859375
+      },
+      "blocks.2.second": {
+        "mac": 0,
+        "ac": 43776,
+        "spikes": 55,
+        "sites": 524288,
+        "input_firing_rate": 0.0001049041748046875
+      },
+      "blocks.2.shortcut.0": {
+        "mac": 0,
+        "ac": 306432,
+        "spikes": 10012,
+        "sites": 1048576,
+        "input_firing_rate": 0.009548187255859375
+      },
+      "blocks.3.first": {
+        "mac": 0,
+        "ac": 96640,
+        "spikes": 118,
+        "sites": 524288,
+        "input_firing_rate": 0.000225067138671875
+      },
+      "blocks.3.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 524288,
+        "input_firing_rate": 0.0
+      },
+      "blocks.4.first": {
+        "mac": 0,
+        "ac": 12288,
+        "spikes": 37,
+        "sites": 524288,
+        "input_firing_rate": 7.05718994140625e-05
+      },
+      "blocks.4.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "input_firing_rate": 0.0
+      },
+      "blocks.4.shortcut.0": {
+        "mac": 0,
+        "ac": 256,
+        "spikes": 37,
+        "sites": 524288,
+        "input_firing_rate": 7.05718994140625e-05
+      },
+      "blocks.5.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "input_firing_rate": 0.0
+      },
+      "blocks.5.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 131072,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.shortcut.0": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "input_firing_rate": 0.0
+      },
+      "blocks.7.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 131072,
+        "input_firing_rate": 0.0
+      },
+      "blocks.7.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 131072,
+        "input_firing_rate": 0.0
+      },
+      "fuse": {
+        "mac": 1904640,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "direction": {
+        "mac": 5120,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.0": {
+        "mac": 17858560,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.1": {
+        "mac": 0,
+        "ac": 42752,
+        "spikes": 167,
+        "sites": 163840,
+        "input_firing_rate": 0.001019287109375
+      },
+      "actor.2": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 81920,
+        "input_firing_rate": 0.0
+      },
+      "actor.3": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 40960,
+        "input_firing_rate": 0.0
+      }
+    }
+  }
+}

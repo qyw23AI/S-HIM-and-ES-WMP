@@ -1,0 +1,31 @@
+# Python / IDE / OS
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
+.DS_Store
+
+# Training / simulation runtime caches & raw logs
+runs/
+logs/
+outputs/
+OUTPUT/
+tmp/
+**/.cache/
+
+# Heavy weights, binary buffers, tensor dumps & raw logs
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.npz
+*.npy
+*.f32
+*.log
+events.out.tfevents.*
+artifacts/**/pid
+artifacts/debug/

@@ -1,0 +1,1107 @@
+{
+  "status": "passed",
+  "protocol_version": 2,
+  "method": "wmp",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "parkour",
+  "num_envs": 4,
+  "steps": 130,
+  "goal_distance_m": 3.0,
+  "checkpoint": "artifacts/teachers/wmp-a1-15000.pt",
+  "event_threshold": 0.08,
+  "flow_mode": "random",
+  "memory_control": "checkpoint",
+  "checkpoint_memory": null,
+  "mask_events_on_pause": false,
+  "pause_trigger_distance_m": 1.6,
+  "stop_speed_mps": 0.15,
+  "delay_frames": 0,
+  "frame_stride": 1,
+  "camera_hz": 10.0,
+  "blur_pixels": 1,
+  "pause_at": 15,
+  "pause_steps": 15,
+  "episode_seconds": 20,
+  "mean_forward_progress_m": 1.2128483772277832,
+  "tracking_rmse_mps": 0.24641775747868966,
+  "successes": 0,
+  "finished_episodes": 1,
+  "success_rate": 0.0,
+  "censored_episodes": 4,
+  "timeout_episodes": 0,
+  "falls": 1,
+  "active_event_pixels": 0,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "failure",
+      "success": false,
+      "completed": true,
+      "fall": true,
+      "distance_m": 1.387134075164795,
+      "control_steps": 128,
+      "speed_sq_error": 8.001976013183594,
+      "speed_samples": 101
+    },
+    {
+      "env": 0,
+      "episode": 1,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 2,
+      "speed_sq_error": 0.0,
+      "speed_samples": 0
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairup",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 1.3179677724838257,
+      "control_steps": 130,
+      "speed_sq_error": 9.365243911743164,
+      "speed_samples": 106
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "hurdle",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 1.8981351852416992,
+      "control_steps": 130,
+      "speed_sq_error": 5.536491870880127,
+      "speed_samples": 102
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "parkour",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 1.4610048532485962,
+      "control_steps": 130,
+      "speed_sq_error": 1.870746374130249,
+      "speed_samples": 99
+    }
+  ],
+  "camera_clock": {
+    "control_dt_s": 0.02,
+    "native_depth_period_control_steps": 5,
+    "delivery_period_control_steps": 5,
+    "delay_unit": "delivered_samples",
+    "invalid_source_step": -1,
+    "teacher_depth_buffer_index": -2,
+    "student_depth_buffer_index": null,
+    "rssm_period_control_steps": 5,
+    "teacher_depth_deliveries": [
+      {
+        "control_step": 0,
+        "source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 5,
+        "source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 10,
+        "source_steps": [
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      {
+        "control_step": 15,
+        "source_steps": [
+          10,
+          10,
+          10,
+          10
+        ]
+      },
+      {
+        "control_step": 20,
+        "source_steps": [
+          15,
+          15,
+          15,
+          15
+        ]
+      },
+      {
+        "control_step": 25,
+        "source_steps": [
+          20,
+          20,
+          20,
+          20
+        ]
+      },
+      {
+        "control_step": 30,
+        "source_steps": [
+          25,
+          25,
+          25,
+          25
+        ]
+      },
+      {
+        "control_step": 35,
+        "source_steps": [
+          30,
+          30,
+          30,
+          30
+        ]
+      },
+      {
+        "control_step": 40,
+        "source_steps": [
+          35,
+          35,
+          35,
+          35
+        ]
+      },
+      {
+        "control_step": 45,
+        "source_steps": [
+          40,
+          40,
+          40,
+          40
+        ]
+      },
+      {
+        "control_step": 50,
+        "source_steps": [
+          45,
+          45,
+          45,
+          45
+        ]
+      },
+      {
+        "control_step": 55,
+        "source_steps": [
+          50,
+          50,
+          50,
+          50
+        ]
+      },
+      {
+        "control_step": 60,
+        "source_steps": [
+          55,
+          55,
+          55,
+          55
+        ]
+      },
+      {
+        "control_step": 65,
+        "source_steps": [
+          60,
+          60,
+          60,
+          60
+        ]
+      },
+      {
+        "control_step": 70,
+        "source_steps": [
+          65,
+          65,
+          65,
+          65
+        ]
+      },
+      {
+        "control_step": 75,
+        "source_steps": [
+          70,
+          70,
+          70,
+          70
+        ]
+      },
+      {
+        "control_step": 80,
+        "source_steps": [
+          75,
+          75,
+          75,
+          75
+        ]
+      },
+      {
+        "control_step": 85,
+        "source_steps": [
+          80,
+          80,
+          80,
+          80
+        ]
+      },
+      {
+        "control_step": 90,
+        "source_steps": [
+          85,
+          85,
+          85,
+          85
+        ]
+      },
+      {
+        "control_step": 95,
+        "source_steps": [
+          90,
+          90,
+          90,
+          90
+        ]
+      },
+      {
+        "control_step": 100,
+        "source_steps": [
+          95,
+          95,
+          95,
+          95
+        ]
+      },
+      {
+        "control_step": 105,
+        "source_steps": [
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      {
+        "control_step": 110,
+        "source_steps": [
+          105,
+          105,
+          105,
+          105
+        ]
+      },
+      {
+        "control_step": 115,
+        "source_steps": [
+          110,
+          110,
+          110,
+          110
+        ]
+      },
+      {
+        "control_step": 120,
+        "source_steps": [
+          115,
+          115,
+          115,
+          115
+        ]
+      },
+      {
+        "control_step": 125,
+        "source_steps": [
+          120,
+          120,
+          120,
+          120
+        ]
+      }
+    ],
+    "student_event_deliveries": [],
+    "rssm_updates": [
+      {
+        "control_step": 0,
+        "teacher_depth_source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 5,
+        "teacher_depth_source_steps": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "control_step": 10,
+        "teacher_depth_source_steps": [
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      {
+        "control_step": 15,
+        "teacher_depth_source_steps": [
+          10,
+          10,
+          10,
+          10
+        ]
+      },
+      {
+        "control_step": 20,
+        "teacher_depth_source_steps": [
+          15,
+          15,
+          15,
+          15
+        ]
+      },
+      {
+        "control_step": 25,
+        "teacher_depth_source_steps": [
+          20,
+          20,
+          20,
+          20
+        ]
+      },
+      {
+        "control_step": 30,
+        "teacher_depth_source_steps": [
+          25,
+          25,
+          25,
+          25
+        ]
+      },
+      {
+        "control_step": 35,
+        "teacher_depth_source_steps": [
+          30,
+          30,
+          30,
+          30
+        ]
+      },
+      {
+        "control_step": 40,
+        "teacher_depth_source_steps": [
+          35,
+          35,
+          35,
+          35
+        ]
+      },
+      {
+        "control_step": 45,
+        "teacher_depth_source_steps": [
+          40,
+          40,
+          40,
+          40
+        ]
+      },
+      {
+        "control_step": 50,
+        "teacher_depth_source_steps": [
+          45,
+          45,
+          45,
+          45
+        ]
+      },
+      {
+        "control_step": 55,
+        "teacher_depth_source_steps": [
+          50,
+          50,
+          50,
+          50
+        ]
+      },
+      {
+        "control_step": 60,
+        "teacher_depth_source_steps": [
+          55,
+          55,
+          55,
+          55
+        ]
+      },
+      {
+        "control_step": 65,
+        "teacher_depth_source_steps": [
+          60,
+          60,
+          60,
+          60
+        ]
+      },
+      {
+        "control_step": 70,
+        "teacher_depth_source_steps": [
+          65,
+          65,
+          65,
+          65
+        ]
+      },
+      {
+        "control_step": 75,
+        "teacher_depth_source_steps": [
+          70,
+          70,
+          70,
+          70
+        ]
+      },
+      {
+        "control_step": 80,
+        "teacher_depth_source_steps": [
+          75,
+          75,
+          75,
+          75
+        ]
+      },
+      {
+        "control_step": 85,
+        "teacher_depth_source_steps": [
+          80,
+          80,
+          80,
+          80
+        ]
+      },
+      {
+        "control_step": 90,
+        "teacher_depth_source_steps": [
+          85,
+          85,
+          85,
+          85
+        ]
+      },
+      {
+        "control_step": 95,
+        "teacher_depth_source_steps": [
+          90,
+          90,
+          90,
+          90
+        ]
+      },
+      {
+        "control_step": 100,
+        "teacher_depth_source_steps": [
+          95,
+          95,
+          95,
+          95
+        ]
+      },
+      {
+        "control_step": 105,
+        "teacher_depth_source_steps": [
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      {
+        "control_step": 110,
+        "teacher_depth_source_steps": [
+          105,
+          105,
+          105,
+          105
+        ]
+      },
+      {
+        "control_step": 115,
+        "teacher_depth_source_steps": [
+          110,
+          110,
+          110,
+          110
+        ]
+      },
+      {
+        "control_step": 120,
+        "teacher_depth_source_steps": [
+          115,
+          115,
+          115,
+          115
+        ]
+      },
+      {
+        "control_step": 125,
+        "teacher_depth_source_steps": [
+          120,
+          120,
+          120,
+          120
+        ]
+      }
+    ]
+  },
+  "stop_and_go": [
+    {
+      "env": 0,
+      "episode": 0,
+      "completed_physical_episode": true,
+      "trigger_step": 15,
+      "trigger_distance_m": 1.4542441368103027,
+      "original_command": [
+        0.7176441550254822,
+        0.0,
+        0.01687958836555481
+      ],
+      "settled_step": 24,
+      "resume_step": 42,
+      "hold_start_step": 27,
+      "min_planar_speed_mps": 0.1011757031083107,
+      "hold_peak_planar_speed_mps": 0.142030268907547,
+      "stopping_action_max_abs": 1.7656357288360596,
+      "recovery_distance_m": 1.2512907981872559,
+      "event_density": {
+        "approach": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "brake": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "hold": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "resume": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        }
+      },
+      "course_outcome": "failure"
+    },
+    {
+      "env": 0,
+      "episode": 1,
+      "completed_physical_episode": false,
+      "trigger_step": 128,
+      "trigger_distance_m": 1.3943216800689697,
+      "original_command": [
+        0.974083662033081,
+        0.0,
+        -0.005546092987060547
+      ],
+      "settled_step": -1,
+      "resume_step": -1,
+      "hold_start_step": null,
+      "min_planar_speed_mps": 0.4745626449584961,
+      "hold_peak_planar_speed_mps": 0.0,
+      "stopping_action_max_abs": 1.2107044458389282,
+      "recovery_distance_m": 0.0,
+      "event_density": {
+        "approach": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "brake": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "hold": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "resume": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        }
+      },
+      "course_outcome": "censored"
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "completed_physical_episode": false,
+      "trigger_step": 15,
+      "trigger_distance_m": 1.3433833122253418,
+      "original_command": [
+        0.7506099343299866,
+        0.0,
+        -0.02428889274597168
+      ],
+      "settled_step": 24,
+      "resume_step": 39,
+      "hold_start_step": 24,
+      "min_planar_speed_mps": 0.08215267956256866,
+      "hold_peak_planar_speed_mps": 0.1497027426958084,
+      "stopping_action_max_abs": 1.9820611476898193,
+      "recovery_distance_m": 1.2151589393615723,
+      "event_density": {
+        "approach": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "brake": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "hold": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "resume": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        }
+      },
+      "course_outcome": "censored"
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "completed_physical_episode": false,
+      "trigger_step": 15,
+      "trigger_distance_m": 1.1425204277038574,
+      "original_command": [
+        0.99199378490448,
+        0.0,
+        -0.009118080139160156
+      ],
+      "settled_step": 28,
+      "resume_step": 43,
+      "hold_start_step": 28,
+      "min_planar_speed_mps": 0.03008563630282879,
+      "hold_peak_planar_speed_mps": 0.13395260274410248,
+      "stopping_action_max_abs": 2.68005108833313,
+      "recovery_distance_m": 1.5583428144454956,
+      "event_density": {
+        "approach": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "brake": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "hold": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "resume": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        }
+      },
+      "course_outcome": "censored"
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "completed_physical_episode": false,
+      "trigger_step": 15,
+      "trigger_distance_m": 1.088308334350586,
+      "original_command": [
+        0.7729799151420593,
+        0.0,
+        0.014026045799255371
+      ],
+      "settled_step": 31,
+      "resume_step": 46,
+      "hold_start_step": 31,
+      "min_planar_speed_mps": 0.10323817282915115,
+      "hold_peak_planar_speed_mps": 0.14378465712070465,
+      "stopping_action_max_abs": 2.060067892074585,
+      "recovery_distance_m": 1.1357243061065674,
+      "event_density": {
+        "approach": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "brake": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "hold": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        },
+        "resume": {
+          "sampled_sites": 0,
+          "raw_density": null,
+          "delivered_density": null
+        }
+      },
+      "course_outcome": "censored"
+    }
+  ],
+  "stop_attempts": 5,
+  "stop_state_resumed_envs": 4,
+  "post_pause_progress_m": [
+    0.0,
+    1.2151589393615723,
+    1.5583428144454956,
+    1.1357243061065674
+  ],
+  "post_pause_resumed_envs": 4,
+  "resume_distance_m": 0.25,
+  "energy": {
+    "decisions": 520,
+    "policy_hz": 50.0,
+    "mac_per_decision": 7443694.276923077,
+    "ac_per_decision": 0.0,
+    "energy_pj_per_decision": 34240993.673846155,
+    "synaptic_power_w": 0.0017120496836923076,
+    "layers": {
+      "world.encoder._cnn.layers.0": {
+        "mac": 54525952,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.3": {
+        "mac": 872415232,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.6": {
+        "mac": 872415232,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.9": {
+        "mac": 872415232,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear0": {
+        "mac": 3514368,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear1": {
+        "mac": 109051904,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear2": {
+        "mac": 109051904,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear3": {
+        "mac": 109051904,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear4": {
+        "mac": 109051904,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_out_layers.0": {
+        "mac": 28311552,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 27,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._imgs_stat_layer": {
+        "mac": 56623104,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 27,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_in_layers.0": {
+        "mac": 57720832,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._cell.layers.GRU_linear": {
+        "mac": 163577856,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_out_layers.0": {
+        "mac": 299892736,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_stat_layer": {
+        "mac": 54525952,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 26,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.0": {
+        "mac": 27955200,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.2": {
+        "mac": 17039360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.4": {
+        "mac": 2329600,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.0": {
+        "mac": 17039360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.2": {
+        "mac": 2129920,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.4": {
+        "mac": 1064960,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.0": {
+        "mac": 9318400,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.2": {
+        "mac": 17039360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.4": {
+        "mac": 4259840,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.6": {
+        "mac": 399360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 130,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 7443694.276923077,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 34240993.673846155,
+      "synaptic_power_w": 0.0017120496836923076
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 7443694.276923077,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 34240993.673846155,
+      "synaptic_power_w": 0.0017120496836923076
+    },
+    "subsystems": {
+      "policy": {
+        "mac_per_decision": 189568.0,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 872012.7999999999,
+        "synaptic_power_w": 4.360064e-05
+      },
+      "cnn": {
+        "mac_per_decision": 5138022.4,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 23634903.04,
+        "synaptic_power_w": 0.001181745152
+      },
+      "prop_mlp": {
+        "mac_per_decision": 845619.2,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 3889848.3199999994,
+        "synaptic_power_w": 0.00019449241599999996
+      },
+      "rssm": {
+        "mac_per_decision": 1270484.6769230769,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 5844229.513846153,
+        "synaptic_power_w": 0.00029221147569230766
+      }
+    },
+    "scope": "policy_and_world_model",
+    "world_model_hz": 10.0,
+    "world_updates": {
+      "startup": {
+        "batches": 1,
+        "frames": 4,
+        "reset_frames": 4,
+        "mac": 148107264
+      },
+      "reset_batch": {
+        "batches": 0,
+        "frames": 0,
+        "reset_frames": 0,
+        "mac": 0
+      },
+      "steady": {
+        "batches": 25,
+        "frames": 100,
+        "reset_frames": 0,
+        "mac": 3624038400
+      }
+    }
+  }
+}

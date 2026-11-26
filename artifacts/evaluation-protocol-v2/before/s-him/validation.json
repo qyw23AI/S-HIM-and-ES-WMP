@@ -1,0 +1,259 @@
+{
+  "status": "passed",
+  "method": "s-him",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "mixed",
+  "num_envs": 4,
+  "steps": 22,
+  "goal_distance_m": 0.02,
+  "checkpoint": "/home/qyw/Graduation project/artifacts/verified/s-him/model.pt",
+  "delay_frames": 0,
+  "frame_stride": 1,
+  "camera_hz": 10.0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 0.2,
+  "mean_forward_progress_m": 0.0088309645652771,
+  "tracking_rmse_mps": 0.359225327484224,
+  "successes": 2,
+  "finished_episodes": 8,
+  "success_rate": 0.25,
+  "censored_episodes": 4,
+  "falls": 0,
+  "active_event_pixels": 0,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "slope",
+      "level": 0,
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.02716231346130371,
+      "speed_sq_error": 1.090993881225586,
+      "speed_samples": 10
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairdown",
+      "level": 0,
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.003951072692871094,
+      "speed_sq_error": 1.6138920783996582,
+      "speed_samples": 10
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.011196613311767578,
+      "speed_sq_error": 0.53226238489151,
+      "speed_samples": 10
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "pit",
+      "level": 0,
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 1.70509672164917,
+      "speed_samples": 10
+    },
+    {
+      "env": 0,
+      "episode": 1,
+      "terrain": "slope",
+      "level": 0,
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.011379718780517578,
+      "speed_sq_error": 0.9346015453338623,
+      "speed_samples": 10
+    },
+    {
+      "env": 1,
+      "episode": 1,
+      "terrain": "stairdown",
+      "level": 0,
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.044129371643066406,
+      "speed_sq_error": 1.2553960084915161,
+      "speed_samples": 10
+    },
+    {
+      "env": 2,
+      "episode": 1,
+      "terrain": "gap",
+      "level": 0,
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 3.150857448577881,
+      "speed_samples": 10
+    },
+    {
+      "env": 3,
+      "episode": 1,
+      "terrain": "pit",
+      "level": 0,
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.008152484893798828,
+      "speed_sq_error": 0.0403268039226532,
+      "speed_samples": 10
+    },
+    {
+      "env": 0,
+      "episode": 2,
+      "terrain": "slope",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 0.0,
+      "speed_samples": 0
+    },
+    {
+      "env": 1,
+      "episode": 2,
+      "terrain": "stairdown",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 0.0,
+      "speed_samples": 0
+    },
+    {
+      "env": 2,
+      "episode": 2,
+      "terrain": "gap",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 0.0,
+      "speed_samples": 0
+    },
+    {
+      "env": 3,
+      "episode": 2,
+      "terrain": "pit",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 0.0,
+      "speed_samples": 0
+    }
+  ],
+  "energy": {
+    "decisions": 88,
+    "policy_hz": 50.0,
+    "mac_per_decision": 47228.0,
+    "ac_per_decision": 8056.318181818182,
+    "energy_pj_per_decision": 224499.48636363636,
+    "synaptic_power_w": 1.1224974318181818e-05,
+    "layers": {
+      "estimator.0.projection": {
+        "mac": 1267200,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "estimator.0.forget": {
+        "mac": 0,
+        "ac": 128,
+        "spikes": 2,
+        "sites": 28160,
+        "input_firing_rate": 7.102272727272727e-05
+      },
+      "estimator.0.input_gate": {
+        "mac": 0,
+        "ac": 128,
+        "spikes": 2,
+        "sites": 28160,
+        "input_firing_rate": 7.102272727272727e-05
+      },
+      "estimator.1.projection": {
+        "mac": 0,
+        "ac": 256,
+        "spikes": 4,
+        "sites": 28160,
+        "input_firing_rate": 0.00014204545454545454
+      },
+      "estimator.1.forget": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 28160,
+        "input_firing_rate": 0.0
+      },
+      "estimator.1.input_gate": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 28160,
+        "input_firing_rate": 0.0
+      },
+      "estimate": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 5632,
+        "input_firing_rate": 0.0
+      },
+      "actor.layers.0": {
+        "mac": 2883584,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.layers.1": {
+        "mac": 0,
+        "ac": 397824,
+        "spikes": 6216,
+        "sites": 45056,
+        "input_firing_rate": 0.13796164772727273
+      },
+      "actor.layers.2": {
+        "mac": 0,
+        "ac": 310620,
+        "spikes": 5177,
+        "sites": 22528,
+        "input_firing_rate": 0.22980291193181818
+      },
+      "actor.readout": {
+        "mac": 5280,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      }
+    }
+  }
+}

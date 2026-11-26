@@ -1,0 +1,108 @@
+{
+  "teacher_checkpoint": "/home/qyw/Graduation project/artifacts/teachers/wmp-a1-15000.pt",
+  "teacher_iterations": 15000,
+  "checkpoint_verified": true,
+  "event_shape": [
+    4,
+    4,
+    2,
+    64,
+    64
+  ],
+  "active_event_pixels": 1220,
+  "resets": 0,
+  "rssm_shape": [
+    20,
+    4,
+    512
+  ],
+  "actor_affine_energy": {
+    "decisions": 80,
+    "policy_hz": 50.0,
+    "mac_per_decision": 189568.0,
+    "ac_per_decision": 0.0,
+    "energy_pj_per_decision": 872012.7999999999,
+    "synaptic_power_w": 4.360064e-05,
+    "layers": {
+      "history_encoder.0": {
+        "mac": 4300800,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "history_encoder.2": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "history_encoder.4": {
+        "mac": 358400,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "wm_feature_encoder.0": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "wm_feature_encoder.2": {
+        "mac": 327680,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "wm_feature_encoder.4": {
+        "mac": 163840,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.0": {
+        "mac": 1433600,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.2": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.4": {
+        "mac": 655360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.6": {
+        "mac": 61440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      }
+    }
+  },
+  "mode": "wmp-events",
+  "status": "passed",
+  "terrain": "mixed",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 20,
+  "policy_hz": 50.0,
+  "event_hz": 10.0,
+  "reward_profile": null
+}

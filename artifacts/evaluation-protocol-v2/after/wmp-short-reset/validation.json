@@ -1,0 +1,438 @@
+{
+  "status": "passed",
+  "protocol_version": 2,
+  "method": "wmp",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "mixed",
+  "num_envs": 4,
+  "steps": 22,
+  "goal_distance_m": 0.02,
+  "checkpoint": "/home/qyw/Graduation project/artifacts/teachers/wmp-a1-15000.pt",
+  "event_threshold": 0.08,
+  "delay_frames": 0,
+  "frame_stride": 1,
+  "camera_hz": 10.0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 0.2,
+  "mean_forward_progress_m": 0.014454454183578491,
+  "tracking_rmse_mps": 0.5281243844720194,
+  "successes": 4,
+  "finished_episodes": 8,
+  "success_rate": 0.5,
+  "censored_episodes": 0,
+  "timeout_episodes": 4,
+  "falls": 0,
+  "active_event_pixels": 0,
+  "episodes": [
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "pit",
+      "level": 0,
+      "outcome": "success",
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.021840333938598633,
+      "control_steps": 3,
+      "speed_sq_error": 0.012274430133402348,
+      "speed_samples": 3
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "success",
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0232391357421875,
+      "control_steps": 5,
+      "speed_sq_error": 1.5409232378005981,
+      "speed_samples": 5
+    },
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "slope",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 11,
+      "speed_sq_error": 2.354508876800537,
+      "speed_samples": 11
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairdown",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 11,
+      "speed_sq_error": 2.4345734119415283,
+      "speed_samples": 11
+    },
+    {
+      "env": 0,
+      "episode": 1,
+      "terrain": "slope",
+      "level": 0,
+      "outcome": "success",
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.028153181076049805,
+      "control_steps": 3,
+      "speed_sq_error": 0.1974983513355255,
+      "speed_samples": 3
+    },
+    {
+      "env": 3,
+      "episode": 1,
+      "terrain": "pit",
+      "level": 0,
+      "outcome": "success",
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.03309369087219238,
+      "control_steps": 9,
+      "speed_sq_error": 2.3805253505706787,
+      "speed_samples": 9
+    },
+    {
+      "env": 1,
+      "episode": 1,
+      "terrain": "stairdown",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.00930929183959961,
+      "control_steps": 11,
+      "speed_sq_error": 1.3989043235778809,
+      "speed_samples": 11
+    },
+    {
+      "env": 2,
+      "episode": 1,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 11,
+      "speed_sq_error": 7.531375408172607,
+      "speed_samples": 11
+    }
+  ],
+  "energy": {
+    "decisions": 88,
+    "policy_hz": 50.0,
+    "mac_per_decision": 8497512.727272727,
+    "ac_per_decision": 0.0,
+    "energy_pj_per_decision": 39088558.54545454,
+    "synaptic_power_w": 0.001954427927272727,
+    "layers": {
+      "world.encoder._cnn.layers.0": {
+        "mac": 10485760,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.3": {
+        "mac": 167772160,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.6": {
+        "mac": 167772160,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.9": {
+        "mac": 167772160,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear0": {
+        "mac": 675840,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear1": {
+        "mac": 20971520,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear2": {
+        "mac": 20971520,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear3": {
+        "mac": 20971520,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear4": {
+        "mac": 20971520,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_out_layers.0": {
+        "mac": 7340032,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 7,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._imgs_stat_layer": {
+        "mac": 14680064,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 7,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_in_layers.0": {
+        "mac": 11100160,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._cell.layers.GRU_linear": {
+        "mac": 31457280,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_out_layers.0": {
+        "mac": 57671680,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_stat_layer": {
+        "mac": 10485760,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.0": {
+        "mac": 4730880,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.2": {
+        "mac": 2883584,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.4": {
+        "mac": 394240,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.0": {
+        "mac": 2883584,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.2": {
+        "mac": 360448,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.4": {
+        "mac": 180224,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.0": {
+        "mac": 1576960,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.2": {
+        "mac": 2883584,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.4": {
+        "mac": 720896,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.6": {
+        "mac": 67584,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 8497512.727272727,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 39088558.54545454,
+      "synaptic_power_w": 0.001954427927272727
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 8497512.727272727,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 39088558.54545454,
+      "synaptic_power_w": 0.001954427927272727
+    },
+    "subsystems": {
+      "policy": {
+        "mac_per_decision": 189568.0,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 872012.7999999999,
+        "synaptic_power_w": 4.360064e-05
+      },
+      "cnn": {
+        "mac_per_decision": 5838661.818181818,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 26857844.363636363,
+        "synaptic_power_w": 0.0013428922181818181
+      },
+      "prop_mlp": {
+        "mac_per_decision": 960930.9090909091,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 4420282.181818182,
+        "synaptic_power_w": 0.00022101410909090908
+      },
+      "rssm": {
+        "mac_per_decision": 1508352.0,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 6938419.199999999,
+        "synaptic_power_w": 0.0003469209599999999
+      }
+    },
+    "scope": "policy_and_world_model",
+    "world_model_hz": 10.0,
+    "world_updates": {
+      "startup": {
+        "batches": 1,
+        "frames": 4,
+        "reset_frames": 4,
+        "mac": 148107264
+      },
+      "reset_batch": {
+        "batches": 1,
+        "frames": 4,
+        "reset_frames": 4,
+        "mac": 148107264
+      },
+      "steady": {
+        "batches": 3,
+        "frames": 12,
+        "reset_frames": 0,
+        "mac": 434884608
+      }
+    }
+  }
+}

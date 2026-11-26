@@ -1,0 +1,582 @@
+From 5b754612c150ad27a6d6183c7e8b0afa8063952e Mon Sep 17 00:00:00 2001
+From: Codex <codex@users.noreply.local>
+Date: Thu, 26 Nov 2026 12:41:03 +0800
+Subject: [PATCH] Optimize static actor projection and add spiking model
+ variants
+
+---
+ graduation/experiments/blind.py          |  10 +-
+ graduation/experiments/parkour.py        |  17 +++-
+ graduation/experiments/visual_suite.py   |   7 +-
+ graduation/methods/es_parkour/student.py | 113 ++++++++++++++++++-----
+ graduation/methods/es_wmp/student.py     |   5 +-
+ graduation/methods/s_him/policy.py       |  17 +++-
+ graduation/snn/neurons.py                |  30 ++++--
+ graduation/snn/population_actor.py       |   7 +-
+ scripts/bench_blind.py                   |  13 +++
+ scripts/bench_parkour.py                 |  11 +++
+ tests/test_model_variants.py             |  57 ++++++++++++
+ 11 files changed, 247 insertions(+), 40 deletions(-)
+ create mode 100644 tests/test_model_variants.py
+
+diff --git a/graduation/experiments/blind.py b/graduation/experiments/blind.py
+index c212d1e..140ffca 100644
+--- a/graduation/experiments/blind.py
++++ b/graduation/experiments/blind.py
+@@ -23,11 +23,13 @@ def run(args):
+     env, adapter, defaults = make_blind_env(args)
+     try:
+         obs, critic_obs = adapter.reset()
+-        model_config_keys = ("normalization", "history", "estimator_width", "estimator_layers", "population", "estimator")
++        model_config_keys = ("normalization", "history", "estimator_width", "estimator_layers", "population", "estimator",
++                             "grsn_threshold", "grsn_bias")
+         checkpoint = torch.load(args.checkpoint, map_location=args.device, weights_only=True) if args.checkpoint else None
+         if checkpoint and args.method == "s-him":
+             for key, val in checkpoint.get("model_config", {}).items():
+                 setattr(args, key, val)
++        args.grsn_threshold = 1.0 if args.grsn_threshold is None else args.grsn_threshold
+         width = adapter.num_one_step_obs
+         actions = adapter.num_actions
+         if args.method == "himloco":
+@@ -37,7 +39,9 @@ def run(args):
+         elif args.method == "s-him":
+             model = SHIM(width, critic_obs.shape[1], actions, args.normalization, args.history,
+                          args.estimator_width, args.estimator_layers, population=args.population,
+-                         recurrent=args.estimator == "grsn").to(args.device)
++                         recurrent=args.estimator == "grsn", grsn_threshold=args.grsn_threshold,
++                         grsn_bias=args.grsn_bias).to(args.device)
++            model.actor.static_projection = not args.legacy_actor_projection
+         elif args.method == "fully-snn":
+             model = build_rma(width, critic_obs.shape[1], obs.shape[1], actions, args.device)
+         else:
+@@ -211,6 +215,8 @@ def run(args):
+                         model(sample, "adapt")
+                     if (completed + iteration + 1) % args.calibration_interval == 0:
+                         model.calibrate(sample)
++            if shim and (args.grsn_diagnostics or args.grsn_threshold != 1.0 or args.grsn_bias is not None):
++                statistics["grsn_layers"] = model.estimator_diagnostics(flatten(histories)[:1024])
+             results.append(statistics)
+             print(statistics, flush=True)
+         with torch.no_grad():
+diff --git a/graduation/experiments/parkour.py b/graduation/experiments/parkour.py
+index 53c7968..da50667 100644
+--- a/graduation/experiments/parkour.py
++++ b/graduation/experiments/parkour.py
+@@ -85,7 +85,12 @@ def run(args):
+             saved = (torch.load(args.checkpoint, map_location=env.device, weights_only=True)
+                      if args.checkpoint else None)
+             channels = saved["base_channels"] if saved else args.base_channels
+-            student = ESStudent(proprio_dim, actions, base=channels).to(env.device)
++            student_config = (saved.get("student_config", {}) if saved else {
++                "normalization": args.student_normalization or "batch", "threshold": args.student_threshold or 1.0,
++                "residual": args.student_residual or "if",
++            })
++            student = ESStudent(proprio_dim, actions, base=channels, **student_config).to(env.device)
++            probe_inputs = None
+             optimizer = torch.optim.Adam(student.parameters(), lr=0.001)
+             if saved:
+                 student.load_state_dict(saved["student"])
+@@ -103,7 +108,8 @@ def run(args):
+                     meter = SynapticMeter(student, es_spike_inputs(student), event_inputs={"stem"})
+             memory = torch.zeros(args.num_envs, student.fuse.hidden_size, device=env.device)
+             iteration_start = saved.get("iteration", 0) if saved else 0
+-            report = {"updates": [], "resets": 0, "event_frames": 0, "spike_pixels": 0}
++            report = {"updates": [], "resets": 0, "event_frames": 0, "spike_pixels": 0,
++                      "student_config": student_config}
+             global_step = 0
+             with meter if meter else nullcontext():
+                 for iteration in range(args.iterations if teacher else 1):
+@@ -116,6 +122,9 @@ def run(args):
+                             frame = events()
+                             if global_step == 0:
+                                 np.save(args.out / "event_frame.npy", frame[0].cpu().numpy())
++                            if args.visual_response_probe and (probe_inputs is None or not probe_has_events):
++                                probe_inputs = (frame.detach().clone(), prop.detach().clone(), memory.detach().clone())
++                                probe_has_events = bool(frame.any())
+                             memory = student.observe(frame, prop, memory)
+                             report["event_frames"] += args.num_envs
+                             report["spike_pixels"] += int(frame.sum())
+@@ -140,9 +149,11 @@ def run(args):
+                         report["updates"].append({"phase": phase, "action_mse": float(action_loss.detach()),
+                                                   "yaw_mse": float(yaw_loss.detach())})
+                     memory = memory.detach()
++            if probe_inputs is not None:
++                report["visual_response"] = student.visual_response(*probe_inputs)
+             if teacher:
+                 torch.save({"student": student.state_dict(), "optimizer": optimizer.state_dict(),
+-                            "base_channels": channels, "iteration": iteration_start + args.iterations},
++                            "base_channels": channels, "student_config": student_config, "iteration": iteration_start + args.iterations},
+                            args.out / "student.pt")
+             if meter:
+                 report["energy"] = meter.report(args.steps * args.num_envs, 1 / env.step_dt)
+diff --git a/graduation/experiments/visual_suite.py b/graduation/experiments/visual_suite.py
+index 9774013..f16ae7f 100644
+--- a/graduation/experiments/visual_suite.py
++++ b/graduation/experiments/visual_suite.py
+@@ -53,7 +53,8 @@ def run(args):
+                 spike_inputs = model.spike_layers()
+                 event_inputs = {"convs.0"}
+             elif method == "es-parkour":
+-                model = ESStudent(44, adapter.num_actions, base=saved["base_channels"]).to(env.device)
++                model = ESStudent(44, adapter.num_actions, base=saved["base_channels"],
++                                  **saved.get("student_config", {})).to(env.device)
+                 model.load_state_dict(saved["student"])
+                 model.eval()
+                 state = torch.zeros(count, model.fuse.hidden_size, device=env.device)
+@@ -65,7 +66,9 @@ def run(args):
+                 model = SHIM(45, 238, adapter.num_actions, normalization=config.get("normalization", "care"),
+                              history=config.get("history", 5), estimator_width=config.get("estimator_width", 64),
+                              estimator_layers=config.get("estimator_layers", 2), population=config.get("population", 5),
+-                             recurrent=config.get("estimator", "grsn") == "grsn").to(env.device)
++                             recurrent=config.get("estimator", "grsn") == "grsn",
++                             grsn_threshold=config.get("grsn_threshold", 1.0),
++                             grsn_bias=config.get("grsn_bias")).to(env.device)
+                 model.load_state_dict(saved["model"])
+                 model = model.fused()
+                 spike_inputs = shim_spike_inputs(model)
+diff --git a/graduation/methods/es_parkour/student.py b/graduation/methods/es_parkour/student.py
+index c4e2ceb..b7c34d5 100644
+--- a/graduation/methods/es_parkour/student.py
++++ b/graduation/methods/es_parkour/student.py
+@@ -1,38 +1,69 @@
+-"""Paper-based ES-Parkour student with a four-tick IF ResNet and analog GRU."""
++"""ES-Parkour IF ResNet and configurable spiking student variants."""
++
+ import torch
+ from torch import nn
+ from torch.nn import functional as F
+ 
+ from graduation.snn.neurons import if_sequence, sequence_layer
++from graduation.snn.normalization import CaReBN
++
++
++def make_norm(channels, normalization, threshold):
++    if normalization == "batch":
++        return nn.BatchNorm2d(channels)
++    norm = CaReBN(channels, normalization, threshold)
++    if normalization == "tdbn":
++        with torch.no_grad():
++            norm.bias.fill_(threshold / 2)
++    return norm
++
++
++def normalize_spatial(norm, current):
++    if isinstance(norm, CaReBN):
++        return norm(current.movedim(2, -1), "adapt" if norm.training else "fixed").movedim(-1, 2)
++    return sequence_layer(norm, current)
+ 
+ 
+ class SpikeBlock(nn.Module):
+-    def __init__(self, inputs, channels, stride):
++    def __init__(self, inputs, channels, stride, normalization="batch", threshold=1.0, residual="if"):
+         super().__init__()
++        self.threshold = threshold
++        self.residual = residual
+         self.first = nn.Conv2d(inputs, channels, 3, stride, 1, bias=False)
+-        self.norm1 = nn.BatchNorm2d(channels)
++        self.norm1 = make_norm(channels, normalization, threshold)
+         self.second = nn.Conv2d(channels, channels, 3, 1, 1, bias=False)
+-        self.norm2 = nn.BatchNorm2d(channels)
+-        self.shortcut = (nn.Sequential(nn.Conv2d(inputs, channels, 1, stride, bias=False), nn.BatchNorm2d(channels))
++        self.norm2 = make_norm(channels, normalization, threshold)
++        self.shortcut = (nn.Sequential(nn.Conv2d(inputs, channels, 1, stride, bias=False),
++                                      make_norm(channels, normalization, threshold))
+                          if stride != 1 or inputs != channels else nn.Identity())
+ 
+     def forward(self, value):
+-        pulses = if_sequence(sequence_layer(self.norm1, sequence_layer(self.first, value)))
+-        current = sequence_layer(self.norm2, sequence_layer(self.second, pulses))
+-        return if_sequence(current + sequence_layer(self.shortcut, value))
++        pulses = if_sequence(normalize_spatial(self.norm1, sequence_layer(self.first, value)), self.threshold)
++        current = normalize_spatial(self.norm2, sequence_layer(self.second, pulses))
++        shortcut = value
++        if isinstance(self.shortcut, nn.Sequential):
++            shortcut = normalize_spatial(self.shortcut[1], sequence_layer(self.shortcut[0], value))
++            if self.residual == "sew-add":
++                shortcut = if_sequence(shortcut, self.threshold)
++        if self.residual == "sew-add":
++            return if_sequence(current, self.threshold) + shortcut
++        return if_sequence(current + shortcut, self.threshold)
+ 
+ 
+ class ESStudent(nn.Module):
+-    def __init__(self, proprio, actions, base=64, latent=64, ticks=4):
++    def __init__(self, proprio, actions, base=64, latent=64, ticks=4,
++                 normalization="batch", threshold=1.0, residual="if"):
+         super().__init__()
+         self.ticks = ticks
++        self.threshold = threshold
+         self.stem = nn.Conv2d(2, base, 7, 2, 3, bias=False)
+-        self.stem_norm = nn.BatchNorm2d(base)
++        self.stem_norm = make_norm(base, normalization, threshold)
+         blocks = []
+         width = base
+         for stage in range(4):
+             out = base * 2 ** stage
+-            blocks.extend((SpikeBlock(width, out, 2 if stage else 1), SpikeBlock(out, out, 1)))
++            opts = (normalization, threshold, residual)
++            blocks.extend((SpikeBlock(width, out, 2 if stage else 1, *opts), SpikeBlock(out, out, 1, *opts)))
+             width = out
+         self.blocks = nn.Sequential(*blocks)
+         self.fuse = nn.GRUCell(width + proprio, latent)
+@@ -40,28 +71,68 @@ class ESStudent(nn.Module):
+         self.actor = nn.ModuleList(nn.Linear(a, b) for a, b in zip(
+             (proprio + latent + 1, 512, 256, 128), (512, 256, 128, actions)
+         ))
++        self.actor_norms = nn.ModuleList(
++            make_norm(width, normalization, threshold) for width in (512, 256, 128)
++        ) if normalization != "batch" else nn.ModuleList()
+ 
+-    def observe(self, events, proprio, memory):
++    def observe(self, events, proprio, memory, trace=None):
+         sequence = events[None].expand(self.ticks, -1, -1, -1, -1)
+-        current = sequence_layer(nn.Sequential(self.stem, self.stem_norm), sequence)
+-        pulses = if_sequence(current)
++        current = normalize_spatial(self.stem_norm, sequence_layer(self.stem, sequence))
++        pulses = if_sequence(current, self.threshold)
+         pulses = F.max_pool2d(pulses.flatten(0, 1), 3, 2, 1).unflatten(0, pulses.shape[:2])
+-        features = self.blocks(pulses).mean(dim=(0, 3, 4))
++        for index, block in enumerate(self.blocks):
++            pulses = block(pulses)
++            if trace is not None:
++                trace[f"blocks.{index}"] = pulses
++        features = pulses.mean(dim=(0, 3, 4))
+         return self.fuse(torch.cat((features, proprio), dim=-1), memory)
+ 
+-    def forward(self, proprio, memory):
++    def forward(self, proprio, memory, trace=None):
+         yaw = self.direction(memory)
+         state = torch.cat((proprio, memory, yaw), dim=-1)
+         pulse = state[None].expand(self.ticks, -1, -1)
+-        for layer in self.actor[:-1]:
+-            pulse = if_sequence(layer(pulse))
++        for index, layer in enumerate(self.actor[:-1]):
++            current = layer(pulse)
++            if len(self.actor_norms):
++                norm = self.actor_norms[index]
++                current = norm(current, "adapt" if self.training else "fixed")
++            pulse = if_sequence(current, self.threshold)
++            if trace is not None:
++                trace[f"actor.{index + 1}.input"] = pulse
+         return self.actor[-1](pulse).mean(dim=0), yaw
+ 
++    @torch.no_grad()
++    def visual_response(self, event, proprio, memory):
++        """Hold proprioception and memory fixed while replacing only the event frame."""
++        training = self.training
++        self.eval()
++        try:
++            traces = [{}, {}]
++            hidden, action = [], []
++            for frame, trace in zip((event, torch.zeros_like(event)), traces):
++                hidden.append(self.observe(frame, proprio, memory, trace))
++                action.append(self(proprio, hidden[-1], trace)[0])
++            layers = {}
++            for name, actual in traces[0].items():
++                zero = traces[1][name]
++                layers[name] = {
++                    "active_fraction": float((actual != 0).float().mean()),
++                    "zero_frame_active_fraction": float((zero != 0).float().mean()),
++                    "max_abs_delta": float((actual - zero).abs().max()),
++                }
++            return {"active_event_pixels": int(event.sum()), "gru_max_abs_delta": float((hidden[0] - hidden[1]).abs().max()),
++                    "action_max_abs_delta": float((action[0] - action[1]).abs().max()), "layers": layers}
++        finally:
++            self.train(training)
++
+ 
+ def es_spike_inputs(model):
+     names = {f"actor.{i}" for i in range(1, len(model.actor))}
+     for i, block in enumerate(model.blocks):
+-        names.update((f"blocks.{i}.first", f"blocks.{i}.second"))
+-        if isinstance(block.shortcut, nn.Sequential):
+-            names.add(f"blocks.{i}.shortcut.0")
++        names.add(f"blocks.{i}.second")
++        # SEW addition produces multi-valued activations after its first block.
++        if i == 0 or block.residual != "sew-add":
++            names.add(f"blocks.{i}.first")
++            if isinstance(block.shortcut, nn.Sequential):
++                names.add(f"blocks.{i}.shortcut.0")
+     return names
+diff --git a/graduation/methods/es_wmp/student.py b/graduation/methods/es_wmp/student.py
+index d260d35..0585c2d 100644
+--- a/graduation/methods/es_wmp/student.py
++++ b/graduation/methods/es_wmp/student.py
+@@ -12,7 +12,7 @@ from graduation.snn.population_actor import LIFActor
+ 
+ class EventSpikingWMP(nn.Module):
+     def __init__(self, proprio_dim=45, latent_dim=512, actions=12, memory_width=128,
+-                 channels=(16, 32, 64), normalization="care", memory="grsn"):
++                 channels=(16, 32, 64), normalization="care", memory="grsn", grsn_threshold=1.0, grsn_bias=None):
+         super().__init__()
+         self.convs = nn.ModuleList(nn.Conv2d(inputs, outputs, 3, 2, 1)
+                                    for inputs, outputs in zip((2, *channels[:-1]), channels))
+@@ -20,7 +20,8 @@ class EventSpikingWMP(nn.Module):
+         self.vision_dim = channels[-1]
+         self.memory = (nn.GRUCell(self.vision_dim + proprio_dim, memory_width)
+                        if memory == "gru" else GRSN(self.vision_dim + proprio_dim, memory_width,
+-                                                   normalization, recurrent=memory == "grsn"))
++                                                   normalization, recurrent=memory == "grsn",
++                                                   threshold=grsn_threshold, initial_bias=grsn_bias))
+         self.memory_width = memory_width
+         self.world = nn.Linear(memory_width, latent_dim)
+         self.actor = LIFActor(latent_dim + proprio_dim, actions, (256, 128), 5, 4, normalization)
+diff --git a/graduation/methods/s_him/policy.py b/graduation/methods/s_him/policy.py
+index 0e1116f..647a752 100644
+--- a/graduation/methods/s_him/policy.py
++++ b/graduation/methods/s_him/policy.py
+@@ -14,12 +14,13 @@ from graduation.snn.population_actor import LIFActor
+ class SHIM(nn.Module):
+     def __init__(self, obs_dim, critic_dim, actions, normalization="care", history=5,
+                  estimator_width=64, estimator_layers=2, actor_widths=(128, 64),
+-                 population=5, ticks=4, recurrent=True):
++                 population=5, ticks=4, recurrent=True, grsn_threshold=1.0, grsn_bias=None):
+         super().__init__()
+         self.obs_dim = obs_dim
+         self.history = history
+         self.estimator = nn.ModuleList(
+-            GRSN(obs_dim if index == 0 else estimator_width, estimator_width, normalization, recurrent)
++            GRSN(obs_dim if index == 0 else estimator_width, estimator_width, normalization, recurrent,
++                 threshold=grsn_threshold, initial_bias=grsn_bias)
+             for index in range(estimator_layers)
+         )
+         self.estimate = nn.Linear(estimator_width, 19)
+@@ -42,6 +43,18 @@ class SHIM(nn.Module):
+             speed, latent = self.estimate_history(obs, statistics)
+         return self.actor(torch.cat((obs[:, :self.obs_dim], speed, latent), dim=-1), statistics)
+ 
++    @torch.no_grad()
++    def estimator_diagnostics(self, obs):
++        sequence = obs.reshape(obs.shape[0], -1, self.obs_dim)[:, :self.history].flip(1)
++        rows = []
++        for index, cell in enumerate(self.estimator):
++            sequence, voltages = cell.sequence(sequence, "fixed", record_voltage=True)
++            voltage = torch.stack(voltages).float().flatten()
++            quantiles = torch.quantile(voltage, voltage.new_tensor([.05, .5, .95]))
++            rows.append({"layer": index, "threshold": cell.threshold, "firing_rate": float(sequence.mean()),
++                         "membrane_p05_p50_p95": quantiles.tolist()})
++        return rows
++
+     def auxiliary_loss(self, obs, successor, swap_weight):
+         speed, latent = self.estimate_history(obs, "adapt")
+         target = F.normalize(self.target(successor[:, :self.obs_dim]), dim=-1)
+diff --git a/graduation/snn/neurons.py b/graduation/snn/neurons.py
+index fd21ab8..9114bcc 100644
+--- a/graduation/snn/neurons.py
++++ b/graduation/snn/neurons.py
+@@ -14,44 +14,60 @@ def spike(voltage):
+ 
+ 
+ class GRSN(nn.Module):
+-    def __init__(self, inputs, width, normalization, recurrent=True):
++    def __init__(self, inputs, width, normalization, recurrent=True, threshold=1.0, initial_bias=None):
+         super().__init__()
+         self.projection = nn.Linear(inputs, width)
+         self.forget = nn.Linear(width, width) if recurrent else None
+         self.input_gate = nn.Linear(width, width) if recurrent else None
+         self.beta = nn.Parameter(torch.zeros(width))
+         self.norm = CaReBN(width, normalization)
++        self.threshold = threshold
++        if initial_bias is not None:
++            if normalization == "none":
++                raise ValueError("GRSN normalization bias requires an active normalization")
++            with torch.no_grad():
++                self.norm.bias.fill_(initial_bias)
+ 
+     def empty_state(self, batch):
+         return self.beta.new_zeros(batch, 3 * self.beta.numel())
+ 
+     def step(self, value, state):
++        pulse, state, _ = self.transition(value, state)
++        return pulse, state
++
++    def transition(self, value, state):
+         voltage, current, previous = state.chunk(3, dim=-1)
+         if self.forget is not None:
+             forget = self.forget(previous).sigmoid()
+             current = forget * current + (1 - forget) * self.input_gate(previous).relu()
+         beta = self.beta.sigmoid()
+         voltage = beta * voltage + (1 - beta) * (value + current)
+-        pulse = spike(voltage - 1)
+-        return pulse, torch.cat((voltage - pulse, current, pulse), dim=-1)
++        pulse = spike(voltage - self.threshold)
++        return pulse, torch.cat((voltage - self.threshold * pulse, current, pulse), dim=-1), voltage
+ 
+     def forward(self, sequence, statistics):
++        return self.sequence(sequence, statistics)[0]
++
++    def sequence(self, sequence, statistics, record_voltage=False):
+         # Unroll one cell update per historical control frame, oldest first.
+         state = self.empty_state(sequence.shape[0])
+         rows = []
++        voltages = []
+         input_current = self.norm(self.projection(sequence), statistics)
+         for value in input_current.unbind(1):
+-            pulse, state = self.step(value, state)
++            pulse, state, voltage = self.transition(value, state)
+             rows.append(pulse)
+-        return torch.stack(rows, dim=1)
++            if record_voltage:
++                voltages.append(voltage)
++        return torch.stack(rows, dim=1), voltages
+ 
+ 
+-def if_sequence(current):
++def if_sequence(current, threshold=1.0):
+     voltage = torch.zeros_like(current[0])
+     result = []
+     for tick in current.unbind(0):
+         voltage = voltage + tick
+-        fired = spike(voltage - 1)
++        fired = spike(voltage - threshold)
+         voltage = voltage * (1 - fired.detach())
+         result.append(fired)
+     return torch.stack(result)
+diff --git a/graduation/snn/population_actor.py b/graduation/snn/population_actor.py
+index 5cd79ce..4074265 100644
+--- a/graduation/snn/population_actor.py
++++ b/graduation/snn/population_actor.py
+@@ -17,11 +17,16 @@ class LIFActor(nn.Module):
+         self.readout = nn.Conv1d(actions, actions, population, groups=actions)
+         self.actions = actions
+         self.ticks = ticks
++        self.static_projection = True
+ 
+     def forward(self, obs, statistics="fixed"):
+         value = obs[:, None].expand(-1, self.ticks, -1)
+         for index, layer in enumerate(self.layers):
+-            current = layer(value)
++            if index == 0 and self.static_projection:
++                current = layer(obs)[:, None].expand(-1, self.ticks, -1)
++            else:
++                current = layer(value)
++            # Keep all repeated sites visible to adaptive and recalibration statistics.
+             if index < len(self.norms):
+                 current = self.norms[index](current, statistics)
+             voltage = torch.zeros_like(current[:, 0])
+diff --git a/scripts/bench_blind.py b/scripts/bench_blind.py
+index 99da14b..34ba120 100644
+--- a/scripts/bench_blind.py
++++ b/scripts/bench_blind.py
+@@ -31,6 +31,11 @@ def parse_args():
+     parser.add_argument("--estimator-layers", type=int, default=2)
+     parser.add_argument("--population", type=int, default=5)
+     parser.add_argument("--estimator", choices=("grsn", "lif"), default="grsn")
++    grsn = parser.add_mutually_exclusive_group()
++    grsn.add_argument("--grsn-threshold", type=float)
++    grsn.add_argument("--grsn-bias", type=float, help="Initial GRSN normalization bias for a fresh run")
++    parser.add_argument("--grsn-diagnostics", action="store_true")
++    parser.add_argument("--legacy-actor-projection", action="store_true")
+     parser.add_argument("--imu-noise", type=float, default=0.0, help="Additional uniform noise in normalized gyro channels")
+     parser.add_argument("--impulse", type=float, default=0.0, help="Lateral body-frame impulse in N s")
+     parser.add_argument("--impulse-step", type=int, default=5)
+@@ -44,6 +49,14 @@ def parse_args():
+     if min(args.num_envs, args.steps, args.iterations, args.calibration_interval,
+            args.estimator_width, args.estimator_layers, args.population) < 1:
+         parser.error("counts and widths must be positive")
++    if (args.grsn_threshold is not None or args.grsn_bias is not None):
++        if args.method != "s-him" or args.estimator != "grsn" or args.checkpoint:
++            parser.error("GRSN tuning requires a fresh S-HIM GRSN run")
++        if args.grsn_threshold is not None and not 0 < args.grsn_threshold < float("inf"):
++            parser.error("--grsn-threshold must be positive and finite")
++        if args.grsn_bias is not None and (
++                args.normalization == "none" or not abs(args.grsn_bias) < float("inf")):
++            parser.error("--grsn-bias requires active normalization and a finite value")
+     if args.energy and not args.eval:
+         parser.error("--energy requires --eval")
+     if args.method == "himloco" and not args.eval:
+diff --git a/scripts/bench_parkour.py b/scripts/bench_parkour.py
+index d5e622a..cf7d4af 100644
+--- a/scripts/bench_parkour.py
++++ b/scripts/bench_parkour.py
+@@ -25,6 +25,10 @@ def parse_args():
+     parser.add_argument("--steps", type=int, default=25)
+     parser.add_argument("--warmup-iterations", type=int, default=2)
+     parser.add_argument("--base-channels", type=int, default=64)
++    parser.add_argument("--student-normalization", choices=("batch", "tdbn", "care"))
++    parser.add_argument("--student-threshold", type=float)
++    parser.add_argument("--student-residual", choices=("if", "sew-add"))
++    parser.add_argument("--visual-response-probe", action="store_true")
+     parser.add_argument("--threshold", type=float, default=0.08)
+     parser.add_argument("--episode-seconds", type=float, default=20)
+     parser.add_argument("--reward-profile", choices=("soft", "strict"), default="soft")
+@@ -40,6 +44,13 @@ def parse_args():
+         parser.error("distill requires --teacher")
+     if min(args.steps, args.iterations, args.num_envs, args.base_channels) < 1 or args.episode_seconds <= 0:
+         parser.error("counts, channels and episode length must be positive")
++    if args.student_threshold is not None and not 0 < args.student_threshold < float("inf"):
++        parser.error("--student-threshold must be positive and finite")
++    if any(item is not None for item in (args.student_normalization, args.student_threshold, args.student_residual)):
++        if args.mode != "distill" or args.checkpoint:
++            parser.error("Student architecture switches require fresh distillation")
++    if args.visual_response_probe and args.mode not in ("distill", "eval"):
++        parser.error("--visual-response-probe requires distill or eval")
+     if args.energy and args.mode not in ("eval", "wmp-events"):
+         parser.error("--energy requires eval or wmp-events")
+     return args
+diff --git a/tests/test_model_variants.py b/tests/test_model_variants.py
+new file mode 100644
+index 0000000..b7de6b1
+--- /dev/null
++++ b/tests/test_model_variants.py
+@@ -0,0 +1,57 @@
++"""Regression checks for opt-in spiking variants and exact pulse reuse."""
++
++import copy
++import unittest
++from unittest.mock import patch
++
++import torch
++
++from graduation.evaluation.energy import SynapticMeter
++from graduation.methods.es_parkour.student import ESStudent, es_spike_inputs
++from graduation.snn.population_actor import LIFActor, spike
++
++
++class ModelVariantsTest(unittest.TestCase):
++    def test_static_projection_preserves_pulses_gradients_and_calibration_sites(self):
++        torch.manual_seed(7)
++        actor = LIFActor(9, 3, (16,), 4, 4, "care")
++        inputs = torch.randn(5, 9)
++        reports = []
++        for optimized in (False, True):
++            model = copy.deepcopy(actor)
++            model.static_projection = optimized
++            observed = []
++            input_leaf = inputs.clone().requires_grad_()
++
++            def record(voltage):
++                pulse = spike(voltage)
++                observed.append(pulse.detach())
++                return pulse
++
++            with patch("graduation.snn.population_actor.spike", record), SynapticMeter(model) as meter:
++                result = model(input_leaf, "calibrate")
++                result.square().sum().backward()
++            reports.append((result, observed, input_leaf.grad, model.layers[0].weight.grad,
++                            model.norms[0].count, meter.report(len(inputs), 50)["layers"]["layers.0"]["mac"]))
++        before, after = reports
++        torch.testing.assert_close(before[:2], after[:2], rtol=0, atol=0)
++        torch.testing.assert_close(before[2:4], after[2:4])
++        self.assertEqual(before[4], after[4])
++        self.assertEqual(after[4], 20)
++        self.assertEqual(before[5], after[5] * 4)
++
++    def test_sew_routes_multivalued_layers_to_dense_counter(self):
++        model = ESStudent(44, 12, base=2, normalization="tdbn", threshold=.5, residual="sew-add").eval()
++        event = torch.randint(2, (1, 2, 16, 16)).float()
++        prop, state = torch.randn(1, 44), torch.zeros(1, 64)
++        spike_layers = es_spike_inputs(model)
++        self.assertIn("blocks.0.first", spike_layers)
++        self.assertNotIn("blocks.1.first", spike_layers)
++        self.assertIn("blocks.1.second", spike_layers)
++        with torch.no_grad(), SynapticMeter(model, spike_layers, {"stem"}) as meter:
++            model(prop, model.observe(event, prop, state))
++        self.assertGreater(meter.report(1, 50)["layers"]["blocks.1.first"]["mac"], 0)
++
++
++if __name__ == "__main__":
++    unittest.main()
+-- 
+2.34.1
+

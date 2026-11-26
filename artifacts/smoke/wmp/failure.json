@@ -1,0 +1,4 @@
+{
+  "traceback": "Traceback (most recent call last):\n  File \"/home/qyw/Graduation project/third_party/WMP/isaaclab_migration/scripts/train.py\", line 261, in <module>\n    if args.require_wm_updates and (runner.wm_updates_done==0 or wm_delta is None or wm_delta<=0):raise RuntimeError('World model did not update')\n                                                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: World model did not update\n",
+  "unix_time": 1795633039.0838692
+}

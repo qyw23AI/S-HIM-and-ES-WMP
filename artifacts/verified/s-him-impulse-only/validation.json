@@ -1,0 +1,155 @@
+{
+  "status": "passed",
+  "method": "s-him",
+  "mode": "eval",
+  "action_shape": [
+    8,
+    12
+  ],
+  "dt": 0.02,
+  "arguments": {
+    "method": "s-him",
+    "rma_phase": "joint",
+    "success_distance_m": 0.5,
+    "num_envs": 8,
+    "iterations": 2,
+    "steps": 16,
+    "seed": 1,
+    "terrain": "rough",
+    "normalization": "care",
+    "swap_weight": 1.0,
+    "history": 5,
+    "estimator_width": 64,
+    "estimator_layers": 2,
+    "population": 5,
+    "estimator": "grsn",
+    "imu_noise": 0.0,
+    "impulse": 1.0,
+    "impulse_step": 5,
+    "calibration_interval": 1,
+    "checkpoint": "artifacts/verified/s-him/model.pt",
+    "eval": true,
+    "energy": true,
+    "out": "artifacts/verified/s-him-impulse-only",
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "results": [
+    {
+      "iteration": 1,
+      "mean_reward": -0.023863935843110085,
+      "resets": 0,
+      "tracking_rmse_mps": 0.788294792175293,
+      "mean_forward_displacement_m": -0.09628075361251831,
+      "impulses_per_env": 1,
+      "mean_lateral_velocity_change_mps": 0.06712749600410461,
+      "successes": 0,
+      "finished_episodes": 0,
+      "terminated_episodes": 0,
+      "censored_episodes": 8,
+      "success_rate": null,
+      "fusion_max_error": 0.0
+    }
+  ],
+  "energy": {
+    "decisions": 128,
+    "policy_hz": 50.0,
+    "mac_per_decision": 47228.0,
+    "ac_per_decision": 9295.296875,
+    "energy_pj_per_decision": 225614.56718749998,
+    "synaptic_power_w": 1.1280728359375e-05,
+    "layers": {
+      "estimator.0.projection": {
+        "mac": 1843200,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "estimator.0.forget": {
+        "mac": 0,
+        "ac": 4800,
+        "spikes": 75,
+        "sites": 40960,
+        "input_firing_rate": 0.0018310546875
+      },
+      "estimator.0.input_gate": {
+        "mac": 0,
+        "ac": 4800,
+        "spikes": 75,
+        "sites": 40960,
+        "input_firing_rate": 0.0018310546875
+      },
+      "estimator.1.projection": {
+        "mac": 0,
+        "ac": 7424,
+        "spikes": 116,
+        "sites": 40960,
+        "input_firing_rate": 0.00283203125
+      },
+      "estimator.1.forget": {
+        "mac": 0,
+        "ac": 1152,
+        "spikes": 18,
+        "sites": 40960,
+        "input_firing_rate": 0.000439453125
+      },
+      "estimator.1.input_gate": {
+        "mac": 0,
+        "ac": 1152,
+        "spikes": 18,
+        "sites": 40960,
+        "input_firing_rate": 0.000439453125
+      },
+      "estimate": {
+        "mac": 0,
+        "ac": 418,
+        "spikes": 22,
+        "sites": 8192,
+        "input_firing_rate": 0.002685546875
+      },
+      "actor.layers.0": {
+        "mac": 4194304,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.layers.1": {
+        "mac": 0,
+        "ac": 730432,
+        "spikes": 11413,
+        "sites": 65536,
+        "input_firing_rate": 0.1741485595703125
+      },
+      "actor.layers.2": {
+        "mac": 0,
+        "ac": 439620,
+        "spikes": 7327,
+        "sites": 32768,
+        "input_firing_rate": 0.223602294921875
+      },
+      "actor.readout": {
+        "mac": 7680,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      }
+    }
+  }
+}

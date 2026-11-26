@@ -1,0 +1,27 @@
+{
+  "teacher_checkpoint": "/home/qyw/WMP/isaaclab_migration/logs/a1_wmp/model_15000.pt",
+  "teacher_iterations": 15000,
+  "checkpoint_verified": true,
+  "event_shape": [
+    4,
+    4,
+    2,
+    64,
+    64
+  ],
+  "active_event_pixels": 1220,
+  "resets": 0,
+  "rssm_shape": [
+    20,
+    4,
+    512
+  ],
+  "mode": "wmp-events",
+  "status": "passed",
+  "terrain": "mixed",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 20,
+  "policy_hz": 50.0,
+  "event_hz": 10.0
+}

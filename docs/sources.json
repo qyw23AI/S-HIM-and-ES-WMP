@@ -1,0 +1,157 @@
+{
+  "upstream": [
+    {
+      "name": "HIMLoco",
+      "category": "基线原码",
+      "path": "third_party/upstream/HIMLoco",
+      "url": "https://github.com/InternRobotics/HIMLoco.git",
+      "commit": "ef289acaa62795009363b7b819c9186690630441"
+    },
+    {
+      "name": "WMP",
+      "category": "基线原码",
+      "path": "third_party/upstream/WMP",
+      "url": "https://github.com/bytedance/WMP.git",
+      "commit": "c232c115ada4517453ebded5019078ba055456de"
+    },
+    {
+      "name": "FullySNNforLeggedRobots",
+      "category": "基线原码",
+      "path": "third_party/upstream/FullySNNforLeggedRobots",
+      "url": "https://github.com/thisisnotahuman/FullySNNforLeggedRobots.git",
+      "commit": "a57791b4494452b8836c2a90df6ffe1a828d56f8"
+    },
+    {
+      "name": "extreme-parkour",
+      "category": "跑酷教师与赛道",
+      "path": "third_party/upstream/extreme-parkour",
+      "url": "https://github.com/chengxuxin/extreme-parkour.git",
+      "commit": "d2ffe27ba59a3229fad22a9fc94c38010bb1f519"
+    },
+    {
+      "name": "AMP_for_hardware",
+      "category": "动作先验",
+      "path": "third_party/upstream/AMP_for_hardware",
+      "url": "https://github.com/escontra/AMP_for_hardware.git",
+      "commit": "bfb0dbdcf32bdf83a916790bddf193fffc7e79b8"
+    },
+    {
+      "name": "CaRe-BN",
+      "category": "脉冲归一化",
+      "path": "third_party/upstream/CaRe-BN",
+      "url": "https://github.com/xuzijie32/CaRe-BN.git",
+      "commit": "6be027dbf82e5fc064faedf499334fe0db9cf19c"
+    },
+    {
+      "name": "GRSN-SNN",
+      "category": "脉冲时序",
+      "path": "third_party/upstream/GRSN-SNN",
+      "url": "https://github.com/StillWolf/GRSN-SNN.git",
+      "commit": "2ca2624a9533145fdc9e9080b39d2e7d8d8ce896"
+    },
+    {
+      "name": "pop-spiking-deep-rl",
+      "category": "群体编码",
+      "path": "third_party/upstream/pop-spiking-deep-rl",
+      "url": "https://github.com/combra-lab/pop-spiking-deep-rl.git",
+      "commit": "5e5b9047899e9f5282d14c8b8212073aa12742ce"
+    },
+    {
+      "name": "spikingjelly",
+      "category": "脉冲库",
+      "path": "third_party/upstream/spikingjelly",
+      "url": "https://github.com/fangwei123456/spikingjelly.git",
+      "commit": "ea10208738a48d905f78589040593d886bacb067"
+    },
+    {
+      "name": "swav",
+      "category": "对比聚类",
+      "path": "third_party/upstream/swav",
+      "url": "https://github.com/facebookresearch/swav.git",
+      "commit": "06b1b7cbaf6ba2a792300d79c7299db98b93b7f9"
+    },
+    {
+      "name": "EOLO",
+      "category": "单帧随机光流",
+      "path": "third_party/upstream/EOLO",
+      "url": "https://github.com/SageCao1125/EOLO.git",
+      "commit": "9911a761c223fe45d3d95de13728c7c02e8c0485"
+    },
+    {
+      "name": "rpg_esim",
+      "category": "事件相机模拟",
+      "path": "third_party/upstream/rpg_esim",
+      "url": "https://github.com/uzh-rpg/rpg_esim.git",
+      "commit": "4cf0b8952e9f58f674c3098f1b027a4b6db53427"
+    },
+    {
+      "name": "v2e",
+      "category": "事件相机模拟",
+      "path": "third_party/upstream/v2e",
+      "url": "https://github.com/SensorsINI/v2e.git",
+      "commit": "48f8d0e6fa65657b56f087b1e84b6effd418f55c"
+    },
+    {
+      "name": "isaac-sim-event-camera-plugin",
+      "category": "Isaac Sim 事件相机",
+      "path": "third_party/upstream/isaac-sim-event-camera-plugin",
+      "url": "https://github.com/spikelab-jhu/isaac-sim-event-camera-plugin.git",
+      "commit": "d6fe47923fad09c4bfa2fd2cb13f82520114cfae"
+    },
+    {
+      "name": "legged_gym",
+      "category": "Isaac Gym 方法参考",
+      "path": "third_party/upstream/legged_gym",
+      "url": "https://github.com/leggedrobotics/legged_gym.git",
+      "commit": "8fa29acc6fd1910c3d9659eef6310bdd301cde0a"
+    },
+    {
+      "name": "rsl_rl",
+      "category": "强化学习框架",
+      "path": "third_party/upstream/rsl_rl",
+      "url": "https://github.com/leggedrobotics/rsl_rl.git",
+      "commit": "4c9900fe242805266b30a91cd75302a6ad376833"
+    },
+    {
+      "name": "dreamerv3",
+      "category": "世界模型",
+      "path": "third_party/upstream/dreamerv3",
+      "url": "https://github.com/danijar/dreamerv3.git",
+      "commit": "e01491fad6434b2245a3b8ca201dd7faedcc458c"
+    },
+    {
+      "name": "unitree_ros",
+      "category": "机器人模型与 ROS",
+      "path": "third_party/upstream/unitree_ros",
+      "url": "https://github.com/unitreerobotics/unitree_ros.git",
+      "commit": "157ff950351e5f535e03c5d85a16b7d594b3dbcc"
+    }
+  ],
+  "local_migrations": [
+    {
+      "name": "MyHIMLoco",
+      "project_path": "third_party/MyHIMLoco",
+      "original_path": "/home/qyw/MyHIMLoco",
+      "source_head": "0fbb2c41704e7d3911f5c2412e29173d0c3af4d8",
+      "notes": "包含工作树中的本机迁移和源码，不含日志、生成缓存和旧运行产物"
+    },
+    {
+      "name": "WMP",
+      "project_path": "third_party/WMP",
+      "original_path": "/home/qyw/WMP",
+      "source_head": "b712a5b673d08e31e782bcdbcd8a32db28e68008",
+      "notes": "包含工作树内未提交的迁移和 legacy 文件。另加可选地形、核心类和起点随机范围入口"
+    }
+  ],
+  "runtime": {
+    "isaac_lab": "2.3.2",
+    "local_checkout": "/home/qyw/MyHIMLoco/IsaacGymEnvs/IsaacLab",
+    "checkout_commit": "9b8b1932456f3258305363c07b214d655cf46b19",
+    "isaac_sim": "5.1.0",
+    "torch": "2.7.0+cu128",
+    "conda": [
+      "himloco",
+      "wmp_lab"
+    ]
+  }
+}

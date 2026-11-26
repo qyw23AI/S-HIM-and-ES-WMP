@@ -1,0 +1,161 @@
+{
+  "status": "passed",
+  "method": "s-him",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "mixed",
+  "num_envs": 4,
+  "steps": 20,
+  "goal_distance_m": 3.0,
+  "checkpoint": "artifacts/verified/s-him/model.pt",
+  "delay_frames": 0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 20,
+  "mean_forward_progress_m": 0.010577499866485596,
+  "tracking_rmse_mps": 0.453978870183196,
+  "successes": 0,
+  "finished_episodes": 0,
+  "success_rate": null,
+  "censored_episodes": 4,
+  "falls": 0,
+  "active_event_pixels": 0,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "slope",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.02716231346130371,
+      "speed_sq_error": 5.895456790924072,
+      "speed_samples": 20
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairdown",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.003951072692871094,
+      "speed_sq_error": 5.470338821411133,
+      "speed_samples": 20
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.011196613311767578,
+      "speed_sq_error": 1.6042653322219849,
+      "speed_samples": 20
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "pit",
+      "level": 0,
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "speed_sq_error": 3.5176842212677,
+      "speed_samples": 20
+    }
+  ],
+  "energy": {
+    "decisions": 80,
+    "policy_hz": 50.0,
+    "mac_per_decision": 47228.0,
+    "ac_per_decision": 7889.2,
+    "energy_pj_per_decision": 224349.08,
+    "synaptic_power_w": 1.1217454e-05,
+    "layers": {
+      "estimator.0.projection": {
+        "mac": 1152000,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "estimator.0.forget": {
+        "mac": 0,
+        "ac": 128,
+        "spikes": 2,
+        "sites": 25600,
+        "input_firing_rate": 7.8125e-05
+      },
+      "estimator.0.input_gate": {
+        "mac": 0,
+        "ac": 128,
+        "spikes": 2,
+        "sites": 25600,
+        "input_firing_rate": 7.8125e-05
+      },
+      "estimator.1.projection": {
+        "mac": 0,
+        "ac": 128,
+        "spikes": 2,
+        "sites": 25600,
+        "input_firing_rate": 7.8125e-05
+      },
+      "estimator.1.forget": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 25600,
+        "input_firing_rate": 0.0
+      },
+      "estimator.1.input_gate": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 25600,
+        "input_firing_rate": 0.0
+      },
+      "estimate": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 5120,
+        "input_firing_rate": 0.0
+      },
+      "actor.layers.0": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "actor.layers.1": {
+        "mac": 0,
+        "ac": 348032,
+        "spikes": 5438,
+        "sites": 40960,
+        "input_firing_rate": 0.132763671875
+      },
+      "actor.layers.2": {
+        "mac": 0,
+        "ac": 282720,
+        "spikes": 4712,
+        "sites": 20480,
+        "input_firing_rate": 0.230078125
+      },
+      "actor.readout": {
+        "mac": 4800,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      }
+    }
+  }
+}

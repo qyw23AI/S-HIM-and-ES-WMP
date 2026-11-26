@@ -1,0 +1,126 @@
+{
+  "method": "fully-snn",
+  "mode": "eval",
+  "action_shape": [
+    8,
+    12
+  ],
+  "dt": 0.02,
+  "arguments": {
+    "method": "fully-snn",
+    "rma_phase": "joint",
+    "success_distance_m": null,
+    "num_envs": 8,
+    "iterations": 2,
+    "steps": 12,
+    "seed": 1,
+    "terrain": "rough",
+    "normalization": "care",
+    "swap_weight": 1.0,
+    "history": 5,
+    "estimator_width": 64,
+    "estimator_layers": 2,
+    "population": 5,
+    "estimator": "grsn",
+    "imu_noise": 0.0,
+    "impulse": 0.0,
+    "impulse_step": 5,
+    "calibration_interval": 1,
+    "checkpoint": "artifacts/smoke/fully-snn/model.pt",
+    "eval": true,
+    "energy": true,
+    "out": "artifacts/verified/fully-snn-eval",
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "results": [
+    {
+      "iteration": 1,
+      "mean_reward": -0.030187910422682762,
+      "resets": 0,
+      "tracking_rmse_mps": 0.7695153951644897,
+      "mean_forward_displacement_m": -0.05827552080154419,
+      "impulses_per_env": 0
+    }
+  ],
+  "energy": {
+    "decisions": 96,
+    "policy_hz": 50.0,
+    "mac_per_decision": 78008.0,
+    "ac_per_decision": 73512.58333333333,
+    "energy_pj_per_decision": 424998.125,
+    "synaptic_power_w": 2.124990625e-05,
+    "layers": {
+      "upstream.adaptation_module.0": {
+        "mac": 6635520,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "upstream.adaptation_module.2": {
+        "mac": 786432,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "upstream.adaptation_module.4": {
+        "mac": 55296,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      },
+      "upstream.actor.snn.hidden_layers.0": {
+        "mac": 0,
+        "ac": 4248320,
+        "spikes": 16595,
+        "sites": 302400,
+        "input_firing_rate": 0.054877645502645504
+      },
+      "upstream.actor.snn.hidden_layers.1": {
+        "mac": 0,
+        "ac": 1560576,
+        "spikes": 6096,
+        "sites": 122880,
+        "input_firing_rate": 0.049609375
+      },
+      "upstream.actor.snn.hidden_layers.2": {
+        "mac": 0,
+        "ac": 1005312,
+        "spikes": 3927,
+        "sites": 122880,
+        "input_firing_rate": 0.0319580078125
+      },
+      "upstream.actor.snn.out_pop_layer": {
+        "mac": 0,
+        "ac": 243000,
+        "spikes": 2025,
+        "sites": 122880,
+        "input_firing_rate": 0.0164794921875
+      },
+      "upstream.actor.decoder.decoder": {
+        "mac": 11520,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "input_firing_rate": null
+      }
+    }
+  }
+}

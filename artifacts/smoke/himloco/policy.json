@@ -1,0 +1,58 @@
+{
+  "format": "TorchScript",
+  "input_shape": [
+    "batch",
+    270
+  ],
+  "output_shape": [
+    "batch",
+    12
+  ],
+  "one_step_obs": 45,
+  "history_length": 6,
+  "history_order": "newest frame first; preserve history across reset as in original code",
+  "frame_order": [
+    "scaled commands xyz",
+    "scaled base angular velocity",
+    "projected gravity",
+    "scaled joint position offset",
+    "scaled joint velocity",
+    "actions"
+  ],
+  "joint_order": [
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint"
+  ],
+  "action_scale": 0.25,
+  "hip_reduction": 1.0,
+  "clip_actions": 100.0,
+  "clip_observations": 100.0,
+  "physics_dt": 0.005,
+  "control_dt": 0.02,
+  "default_joint_angles": {
+    "FL_hip_joint": 0.1,
+    "RL_hip_joint": 0.1,
+    "FR_hip_joint": -0.1,
+    "RR_hip_joint": -0.1,
+    "FL_thigh_joint": 0.8,
+    "RL_thigh_joint": 1.0,
+    "FR_thigh_joint": 0.8,
+    "RR_thigh_joint": 1.0,
+    "FL_calf_joint": -1.5,
+    "RL_calf_joint": -1.5,
+    "FR_calf_joint": -1.5,
+    "RR_calf_joint": -1.5
+  },
+  "checkpoint": "/home/qyw/Graduation project/artifacts/smoke/himloco/model_1.pt",
+  "round_trip_max_error": 1.7881393432617188e-07
+}

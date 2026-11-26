@@ -1,0 +1,343 @@
+{
+  "status": "passed",
+  "protocol_version": 2,
+  "method": "es-parkour",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "mixed",
+  "num_envs": 4,
+  "steps": 20,
+  "goal_distance_m": 3.0,
+  "checkpoint": "/home/qyw/Graduation project/artifacts/verified/es-distill-final/student.pt",
+  "event_threshold": 0.08,
+  "delay_frames": 0,
+  "frame_stride": 1,
+  "camera_hz": 10.0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 20,
+  "mean_forward_progress_m": 0.01161891222000122,
+  "tracking_rmse_mps": 0.3981138158107593,
+  "successes": 0,
+  "finished_episodes": 0,
+  "success_rate": null,
+  "censored_episodes": 4,
+  "timeout_episodes": 0,
+  "falls": 0,
+  "active_event_pixels": 1621,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "slope",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.029847145080566406,
+      "control_steps": 20,
+      "speed_sq_error": 4.279995918273926,
+      "speed_samples": 20
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairdown",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.00495147705078125,
+      "control_steps": 20,
+      "speed_sq_error": 4.6383137702941895,
+      "speed_samples": 20
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.011677026748657227,
+      "control_steps": 20,
+      "speed_sq_error": 0.7422481179237366,
+      "speed_samples": 20
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "pit",
+      "level": 0,
+      "outcome": "censored",
+      "success": false,
+      "completed": false,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 20,
+      "speed_sq_error": 3.0190110206604004,
+      "speed_samples": 20
+    }
+  ],
+  "energy": {
+    "decisions": 80,
+    "policy_hz": 50.0,
+    "mac_per_decision": 5385126.4,
+    "ac_per_decision": 331015.2,
+    "energy_pj_per_decision": 25069495.12,
+    "synaptic_power_w": 0.0012534747559999999,
+    "layers": {
+      "stem": {
+        "mac": 0,
+        "ac": 4878848,
+        "spikes": 6484,
+        "sites": 524288,
+        "calls": 4,
+        "event_dense_mac": 411041792,
+        "input_firing_rate": 0.01236724853515625
+      },
+      "blocks.0.first": {
+        "mac": 0,
+        "ac": 13910144,
+        "spikes": 26018,
+        "sites": 1048576,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.024812698364257812
+      },
+      "blocks.0.second": {
+        "mac": 0,
+        "ac": 1357440,
+        "spikes": 2599,
+        "sites": 1048576,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0024785995483398438
+      },
+      "blocks.1.first": {
+        "mac": 0,
+        "ac": 8192000,
+        "spikes": 15359,
+        "sites": 1048576,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.014647483825683594
+      },
+      "blocks.1.second": {
+        "mac": 0,
+        "ac": 209728,
+        "spikes": 394,
+        "sites": 1048576,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0003757476806640625
+      },
+      "blocks.2.first": {
+        "mac": 0,
+        "ac": 2384640,
+        "spikes": 9139,
+        "sites": 1048576,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.008715629577636719
+      },
+      "blocks.2.second": {
+        "mac": 0,
+        "ac": 20864,
+        "spikes": 27,
+        "sites": 524288,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 5.14984130859375e-05
+      },
+      "blocks.2.shortcut.0": {
+        "mac": 0,
+        "ac": 277632,
+        "spikes": 9139,
+        "sites": 1048576,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.008715629577636719
+      },
+      "blocks.3.first": {
+        "mac": 0,
+        "ac": 66560,
+        "spikes": 82,
+        "sites": 524288,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.000156402587890625
+      },
+      "blocks.3.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 524288,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.4.first": {
+        "mac": 0,
+        "ac": 16896,
+        "spikes": 34,
+        "sites": 524288,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 6.4849853515625e-05
+      },
+      "blocks.4.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.4.shortcut.0": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 34,
+        "sites": 524288,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 6.4849853515625e-05
+      },
+      "blocks.5.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.5.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 131072,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.shortcut.0": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 262144,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.7.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 131072,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.7.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 131072,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "fuse": {
+        "mac": 1904640,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "direction": {
+        "mac": 5120,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.0": {
+        "mac": 17858560,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.1": {
+        "mac": 0,
+        "ac": 45312,
+        "spikes": 177,
+        "sites": 163840,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.001080322265625
+      },
+      "actor.2": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 81920,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "actor.3": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 40960,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 5385126.4,
+      "ac_per_decision": 331015.2,
+      "energy_pj_per_decision": 25069495.12,
+      "synaptic_power_w": 0.0012534747559999999
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 247104.0,
+      "ac_per_decision": 392000.8,
+      "energy_pj_per_decision": 1489479.1199999999,
+      "synaptic_power_w": 7.4473956e-05
+    }
+  }
+}

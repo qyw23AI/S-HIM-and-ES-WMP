@@ -1,0 +1,334 @@
+{
+  "updates": [],
+  "resets": 0,
+  "event_frames": 12,
+  "spike_pixels": 1142,
+  "student_config": {},
+  "visual_response": {
+    "active_event_pixels": 347,
+    "gru_max_abs_delta": 0.0,
+    "action_max_abs_delta": 0.0,
+    "layers": {
+      "blocks.0": {
+        "active_fraction": 0.012897491455078125,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 1.0
+      },
+      "blocks.1": {
+        "active_fraction": 0.00786590576171875,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 1.0
+      },
+      "blocks.2": {
+        "active_fraction": 0.0001373291015625,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 1.0
+      },
+      "blocks.3": {
+        "active_fraction": 1.52587890625e-05,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 1.0
+      },
+      "blocks.4": {
+        "active_fraction": 0.0,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 0.0
+      },
+      "blocks.5": {
+        "active_fraction": 0.0,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 0.0
+      },
+      "blocks.6": {
+        "active_fraction": 0.0,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 0.0
+      },
+      "blocks.7": {
+        "active_fraction": 0.0,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 0.0
+      },
+      "actor.1.input": {
+        "active_fraction": 0.0030517578125,
+        "zero_frame_active_fraction": 0.0030517578125,
+        "max_abs_delta": 0.0
+      },
+      "actor.2.input": {
+        "active_fraction": 0.0,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 0.0
+      },
+      "actor.3.input": {
+        "active_fraction": 0.0,
+        "zero_frame_active_fraction": 0.0,
+        "max_abs_delta": 0.0
+      }
+    }
+  },
+  "energy": {
+    "decisions": 48,
+    "policy_hz": 50.0,
+    "mac_per_decision": 6675584.0,
+    "ac_per_decision": 422160.0,
+    "energy_pj_per_decision": 31087630.4,
+    "synaptic_power_w": 0.00155438152,
+    "layers": {
+      "stem": {
+        "mac": 0,
+        "ac": 3455232,
+        "spikes": 4568,
+        "sites": 393216,
+        "calls": 3,
+        "event_dense_mac": 308281344,
+        "input_firing_rate": 0.011617024739583334
+      },
+      "blocks.0.first": {
+        "mac": 0,
+        "ac": 10547264,
+        "spikes": 19008,
+        "sites": 786432,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.024169921875
+      },
+      "blocks.0.second": {
+        "mac": 0,
+        "ac": 1029248,
+        "spikes": 1834,
+        "sites": 786432,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0023320515950520835
+      },
+      "blocks.1.first": {
+        "mac": 0,
+        "ac": 6321856,
+        "spikes": 11407,
+        "sites": 786432,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.014504750569661459
+      },
+      "blocks.1.second": {
+        "mac": 0,
+        "ac": 132352,
+        "spikes": 235,
+        "sites": 786432,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0002988179524739583
+      },
+      "blocks.2.first": {
+        "mac": 0,
+        "ac": 1871872,
+        "spikes": 6867,
+        "sites": 786432,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.008731842041015625
+      },
+      "blocks.2.second": {
+        "mac": 0,
+        "ac": 20096,
+        "spikes": 19,
+        "sites": 393216,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 4.8319498697916664e-05
+      },
+      "blocks.2.shortcut.0": {
+        "mac": 0,
+        "ac": 222848,
+        "spikes": 6867,
+        "sites": 786432,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.008731842041015625
+      },
+      "blocks.3.first": {
+        "mac": 0,
+        "ac": 66432,
+        "spikes": 66,
+        "sites": 393216,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0001678466796875
+      },
+      "blocks.3.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 393216,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.4.first": {
+        "mac": 0,
+        "ac": 9216,
+        "spikes": 18,
+        "sites": 393216,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 4.57763671875e-05
+      },
+      "blocks.4.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 196608,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.4.shortcut.0": {
+        "mac": 0,
+        "ac": 512,
+        "spikes": 18,
+        "sites": 393216,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 4.57763671875e-05
+      },
+      "blocks.5.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 196608,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.5.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 196608,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 196608,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 98304,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.6.shortcut.0": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 196608,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.7.first": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 98304,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "blocks.7.second": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 98304,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "fuse": {
+        "mac": 1428480,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 3,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "direction": {
+        "mac": 3072,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 12,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.0": {
+        "mac": 10715136,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 12,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.1": {
+        "mac": 0,
+        "ac": 41984,
+        "spikes": 164,
+        "sites": 98304,
+        "calls": 12,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0016682942708333333
+      },
+      "actor.2": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 49152,
+        "calls": 12,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "actor.3": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 24576,
+        "calls": 12,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 6675584.0,
+      "ac_per_decision": 422160.0,
+      "energy_pj_per_decision": 31087630.4,
+      "synaptic_power_w": 0.00155438152
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 253056.0,
+      "ac_per_decision": 494144.0,
+      "energy_pj_per_decision": 1608787.2,
+      "synaptic_power_w": 8.043936e-05
+    }
+  },
+  "mode": "eval",
+  "status": "passed",
+  "terrain": "parkour",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 12,
+  "policy_hz": 50.0,
+  "event_hz": 10.0,
+  "reward_profile": "soft"
+}

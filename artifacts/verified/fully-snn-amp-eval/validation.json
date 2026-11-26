@@ -1,0 +1,22 @@
+{
+  "mode": "eval",
+  "rollout_steps": 12,
+  "dt": 0.03,
+  "num_envs": 4,
+  "obs_shape": [
+    4,
+    42
+  ],
+  "critic_shape": [
+    4,
+    48
+  ],
+  "amp_obs_shape": [
+    4,
+    43
+  ],
+  "updates": [],
+  "resets": 0,
+  "seed": 1,
+  "status": "passed"
+}

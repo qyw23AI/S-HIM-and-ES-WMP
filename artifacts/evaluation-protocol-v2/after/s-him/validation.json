@@ -1,0 +1,333 @@
+{
+  "status": "passed",
+  "protocol_version": 2,
+  "method": "s-him",
+  "purpose": "smoke",
+  "seed": 1,
+  "terrain": "mixed",
+  "num_envs": 4,
+  "steps": 22,
+  "goal_distance_m": 0.02,
+  "checkpoint": "/home/qyw/Graduation project/artifacts/verified/s-him/model.pt",
+  "event_threshold": 0.08,
+  "delay_frames": 0,
+  "frame_stride": 1,
+  "camera_hz": 10.0,
+  "blur_pixels": 1,
+  "pause_at": 5,
+  "pause_steps": 0,
+  "episode_seconds": 0.2,
+  "mean_forward_progress_m": 0.010469555854797363,
+  "tracking_rmse_mps": 0.3567627546949622,
+  "successes": 2,
+  "finished_episodes": 8,
+  "success_rate": 0.25,
+  "censored_episodes": 0,
+  "timeout_episodes": 6,
+  "falls": 0,
+  "active_event_pixels": 0,
+  "episodes": [
+    {
+      "env": 0,
+      "episode": 0,
+      "terrain": "slope",
+      "level": 0,
+      "outcome": "success",
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.023056507110595703,
+      "control_steps": 5,
+      "speed_sq_error": 0.046797022223472595,
+      "speed_samples": 5
+    },
+    {
+      "env": 1,
+      "episode": 0,
+      "terrain": "stairdown",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.003908634185791016,
+      "control_steps": 11,
+      "speed_sq_error": 2.020364999771118,
+      "speed_samples": 11
+    },
+    {
+      "env": 2,
+      "episode": 0,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.011196613311767578,
+      "control_steps": 11,
+      "speed_sq_error": 0.7070714235305786,
+      "speed_samples": 11
+    },
+    {
+      "env": 3,
+      "episode": 0,
+      "terrain": "pit",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 11,
+      "speed_sq_error": 2.0147452354431152,
+      "speed_samples": 11
+    },
+    {
+      "env": 1,
+      "episode": 1,
+      "terrain": "stairdown",
+      "level": 0,
+      "outcome": "success",
+      "success": true,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.026062488555908203,
+      "control_steps": 3,
+      "speed_sq_error": 0.001264865044504404,
+      "speed_samples": 3
+    },
+    {
+      "env": 0,
+      "episode": 1,
+      "terrain": "slope",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.011379718780517578,
+      "control_steps": 11,
+      "speed_sq_error": 1.0886183977127075,
+      "speed_samples": 11
+    },
+    {
+      "env": 2,
+      "episode": 1,
+      "terrain": "gap",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.0,
+      "control_steps": 11,
+      "speed_sq_error": 3.454644203186035,
+      "speed_samples": 11
+    },
+    {
+      "env": 3,
+      "episode": 1,
+      "terrain": "pit",
+      "level": 0,
+      "outcome": "timeout",
+      "success": false,
+      "completed": true,
+      "fall": false,
+      "distance_m": 0.008152484893798828,
+      "control_steps": 11,
+      "speed_sq_error": 0.08518892526626587,
+      "speed_samples": 11
+    }
+  ],
+  "shim_observation_probe": {
+    "physical_commands": [
+      [
+        0.34259065985679626,
+        0.0,
+        0.0
+      ],
+      [
+        0.39882543683052063,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.2787887156009674,
+        0.0,
+        0.0
+      ]
+    ],
+    "legacy_commands": [
+      [
+        0.34259065985679626,
+        0.0,
+        0.0
+      ],
+      [
+        0.39882543683052063,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.2787887156009674,
+        0.0,
+        0.0
+      ]
+    ],
+    "corrected_commands": [
+      [
+        0.6851813197135925,
+        0.0,
+        0.0
+      ],
+      [
+        0.7976508736610413,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.5575774312019348,
+        0.0,
+        0.0
+      ]
+    ],
+    "action_delta_max_abs": 0.04190942645072937
+  },
+  "energy": {
+    "decisions": 88,
+    "policy_hz": 50.0,
+    "mac_per_decision": 47228.0,
+    "ac_per_decision": 8507.40909090909,
+    "energy_pj_per_decision": 224905.46818181817,
+    "synaptic_power_w": 1.1245273409090908e-05,
+    "layers": {
+      "estimator.0.projection": {
+        "mac": 1267200,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "estimator.0.forget": {
+        "mac": 0,
+        "ac": 384,
+        "spikes": 6,
+        "sites": 28160,
+        "calls": 110,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0002130681818181818
+      },
+      "estimator.0.input_gate": {
+        "mac": 0,
+        "ac": 384,
+        "spikes": 6,
+        "sites": 28160,
+        "calls": 110,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0002130681818181818
+      },
+      "estimator.1.projection": {
+        "mac": 0,
+        "ac": 1472,
+        "spikes": 23,
+        "sites": 28160,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0008167613636363636
+      },
+      "estimator.1.forget": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 28160,
+        "calls": 110,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "estimator.1.input_gate": {
+        "mac": 0,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 28160,
+        "calls": 110,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0
+      },
+      "estimate": {
+        "mac": 0,
+        "ac": 76,
+        "spikes": 4,
+        "sites": 5632,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.0007102272727272727
+      },
+      "actor.layers.0": {
+        "mac": 2883584,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.layers.1": {
+        "mac": 0,
+        "ac": 430016,
+        "spikes": 6719,
+        "sites": 45056,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.14912553267045456
+      },
+      "actor.layers.2": {
+        "mac": 0,
+        "ac": 316320,
+        "spikes": 5272,
+        "sites": 22528,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": 0.23401988636363635
+      },
+      "actor.readout": {
+        "mac": 5280,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 22,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 47228.0,
+      "ac_per_decision": 8507.40909090909,
+      "energy_pj_per_decision": 224905.46818181817,
+      "synaptic_power_w": 1.1245273409090908e-05
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 47228.0,
+      "ac_per_decision": 8507.40909090909,
+      "energy_pj_per_decision": 224905.46818181817,
+      "synaptic_power_w": 1.1245273409090908e-05
+    }
+  }
+}

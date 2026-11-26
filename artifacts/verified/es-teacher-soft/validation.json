@@ -1,0 +1,23 @@
+{
+  "updates": [
+    {
+      "ppo_loss": 0.0983881875872612,
+      "mean_reward": -0.07556451112031937,
+      "reward_std": 0.030969612300395966
+    },
+    {
+      "ppo_loss": 0.09065274894237518,
+      "mean_reward": -0.07629553973674774,
+      "reward_std": 0.03969277814030647
+    }
+  ],
+  "mode": "teacher",
+  "status": "passed",
+  "terrain": "parkour",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 25,
+  "policy_hz": 50.0,
+  "event_hz": 10.0,
+  "reward_profile": "soft"
+}

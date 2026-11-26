@@ -1,0 +1,61 @@
+{
+  "method": "fully-snn",
+  "mode": "train",
+  "action_shape": [
+    8,
+    12
+  ],
+  "dt": 0.02,
+  "arguments": {
+    "method": "fully-snn",
+    "rma_phase": "adaptation",
+    "success_distance_m": null,
+    "num_envs": 8,
+    "iterations": 1,
+    "steps": 8,
+    "seed": 1,
+    "terrain": "rough",
+    "normalization": "care",
+    "swap_weight": 1.0,
+    "history": 5,
+    "estimator_width": 64,
+    "estimator_layers": 2,
+    "population": 5,
+    "estimator": "grsn",
+    "imu_noise": 0.0,
+    "impulse": 0.0,
+    "impulse_step": 5,
+    "calibration_interval": 1,
+    "checkpoint": "artifacts/smoke/fully-snn/model.pt",
+    "eval": false,
+    "energy": false,
+    "out": "artifacts/verified/fully-snn-adaptation",
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "results": [
+    {
+      "iteration": 2,
+      "mean_reward": -0.034600164741277695,
+      "resets": 0,
+      "tracking_rmse_mps": 0.7659991383552551,
+      "mean_forward_displacement_m": -0.03246104717254639,
+      "impulses_per_env": 0,
+      "auxiliary_loss": 0.055405158549547195
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+{
+  "teacher_checkpoint": "/home/qyw/Graduation project/artifacts/teachers/wmp-a1-15000.pt",
+  "teacher_iterations": 15000,
+  "checkpoint_verified": true,
+  "event_shape": [
+    4,
+    4,
+    2,
+    64,
+    64
+  ],
+  "active_event_pixels": 1220,
+  "resets": 0,
+  "rssm_shape": [
+    20,
+    4,
+    512
+  ],
+  "energy": {
+    "decisions": 80,
+    "policy_hz": 50.0,
+    "mac_per_decision": 7476966.4,
+    "ac_per_decision": 0.0,
+    "energy_pj_per_decision": 34394045.44,
+    "synaptic_power_w": 0.001719702272,
+    "layers": {
+      "world.encoder._cnn.layers.0": {
+        "mac": 8388608,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.3": {
+        "mac": 134217728,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.6": {
+        "mac": 134217728,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._cnn.layers.9": {
+        "mac": 134217728,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear0": {
+        "mac": 540672,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear1": {
+        "mac": 16777216,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear2": {
+        "mac": 16777216,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear3": {
+        "mac": 16777216,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.encoder._mlp.layers.Encoder_linear4": {
+        "mac": 16777216,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_out_layers.0": {
+        "mac": 5242880,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._imgs_stat_layer": {
+        "mac": 10485760,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 5,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._img_in_layers.0": {
+        "mac": 8880128,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._cell.layers.GRU_linear": {
+        "mac": 25165824,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_out_layers.0": {
+        "mac": 46137344,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "world.dynamics._obs_stat_layer": {
+        "mac": 8388608,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 4,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.0": {
+        "mac": 4300800,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.2": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.history_encoder.4": {
+        "mac": 358400,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.0": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.2": {
+        "mac": 327680,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.wm_feature_encoder.4": {
+        "mac": 163840,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.0": {
+        "mac": 1433600,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.2": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.4": {
+        "mac": 655360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "policy.actor.6": {
+        "mac": 61440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    },
+    "conservative_first_layer_mac": {
+      "mac_per_decision": 7476966.4,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 34394045.44,
+      "synaptic_power_w": 0.001719702272
+    },
+    "strict_event_ac": {
+      "mac_per_decision": 7476966.4,
+      "ac_per_decision": 0.0,
+      "energy_pj_per_decision": 34394045.44,
+      "synaptic_power_w": 0.001719702272
+    },
+    "subsystems": {
+      "policy": {
+        "mac_per_decision": 189568.0,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 872012.7999999999,
+        "synaptic_power_w": 4.360064e-05
+      },
+      "cnn": {
+        "mac_per_decision": 5138022.4,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 23634903.04,
+        "synaptic_power_w": 0.001181745152
+      },
+      "prop_mlp": {
+        "mac_per_decision": 845619.2,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 3889848.3199999994,
+        "synaptic_power_w": 0.00019449241599999996
+      },
+      "rssm": {
+        "mac_per_decision": 1303756.8,
+        "ac_per_decision": 0.0,
+        "energy_pj_per_decision": 5997281.279999999,
+        "synaptic_power_w": 0.0002998640639999999
+      }
+    },
+    "scope": "policy_and_world_model",
+    "world_model_hz": 10.0,
+    "world_updates": {
+      "startup": {
+        "batches": 1,
+        "frames": 4,
+        "reset_frames": 4,
+        "mac": 148107264
+      },
+      "reset_batch": {
+        "batches": 0,
+        "frames": 0,
+        "reset_frames": 0,
+        "mac": 0
+      },
+      "steady": {
+        "batches": 3,
+        "frames": 12,
+        "reset_frames": 0,
+        "mac": 434884608
+      }
+    }
+  },
+  "actor_affine_energy": {
+    "decisions": 80,
+    "policy_hz": 50.0,
+    "mac_per_decision": 189568.0,
+    "ac_per_decision": 0.0,
+    "energy_pj_per_decision": 872012.7999999999,
+    "synaptic_power_w": 4.360064e-05,
+    "layers": {
+      "history_encoder.0": {
+        "mac": 4300800,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "history_encoder.2": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "history_encoder.4": {
+        "mac": 358400,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "wm_feature_encoder.0": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "wm_feature_encoder.2": {
+        "mac": 327680,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "wm_feature_encoder.4": {
+        "mac": 163840,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.0": {
+        "mac": 1433600,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.2": {
+        "mac": 2621440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.4": {
+        "mac": 655360,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      },
+      "actor.6": {
+        "mac": 61440,
+        "ac": 0,
+        "spikes": 0,
+        "sites": 0,
+        "calls": 20,
+        "event_dense_mac": 0,
+        "input_firing_rate": null
+      }
+    }
+  },
+  "mode": "wmp-events",
+  "status": "passed",
+  "terrain": "mixed",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 20,
+  "policy_hz": 50.0,
+  "event_hz": 10.0,
+  "reward_profile": null
+}

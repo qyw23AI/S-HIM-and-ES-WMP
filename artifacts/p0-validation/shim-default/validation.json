@@ -1,0 +1,160 @@
+{
+  "status": "passed",
+  "method": "s-him",
+  "mode": "train",
+  "action_shape": [
+    4,
+    12
+  ],
+  "dt": 0.02,
+  "arguments": {
+    "method": "s-him",
+    "rma_phase": "joint",
+    "success_distance_m": null,
+    "num_envs": 4,
+    "iterations": 3,
+    "steps": 16,
+    "seed": 1,
+    "terrain": "flat",
+    "normalization": "care",
+    "swap_weight": 1.0,
+    "history": 5,
+    "estimator_width": 64,
+    "estimator_layers": 2,
+    "population": 5,
+    "estimator": "grsn",
+    "grsn_threshold": 1.0,
+    "grsn_bias": null,
+    "grsn_diagnostics": true,
+    "legacy_actor_projection": false,
+    "imu_noise": 0.0,
+    "impulse": 0.0,
+    "impulse_step": 5,
+    "calibration_interval": 1,
+    "checkpoint": null,
+    "eval": false,
+    "energy": false,
+    "out": "/home/qyw/Graduation project/artifacts/p0-validation/shim-default",
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "results": [
+    {
+      "iteration": 1,
+      "mean_reward": -0.06035350263118744,
+      "resets": 0,
+      "tracking_rmse_mps": 0.8817094564437866,
+      "mean_forward_displacement_m": -0.09183104336261749,
+      "impulses_per_env": 0,
+      "velocity_loss": 1.472623586654663,
+      "swap_loss": 6.126002311706543,
+      "auxiliary_loss": 7.598626136779785,
+      "ppo_loss": -0.034852609038352966,
+      "grsn_layers": [
+        {
+          "layer": 0,
+          "threshold": 1.0,
+          "firing_rate": 0.03432617336511612,
+          "membrane_p05_p50_p95": [
+            -0.08364395797252655,
+            0.40702030062675476,
+            0.9398903846740723
+          ]
+        },
+        {
+          "layer": 1,
+          "threshold": 1.0,
+          "firing_rate": 0.03486328199505806,
+          "membrane_p05_p50_p95": [
+            0.0123252859339118,
+            0.3742748200893402,
+            0.9288632273674011
+          ]
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "mean_reward": -0.051991935819387436,
+      "resets": 0,
+      "tracking_rmse_mps": 1.0752824544906616,
+      "mean_forward_displacement_m": -0.1402270495891571,
+      "impulses_per_env": 0,
+      "velocity_loss": 0.7953862547874451,
+      "swap_loss": 6.269472122192383,
+      "auxiliary_loss": 7.064858436584473,
+      "ppo_loss": -0.10611104220151901,
+      "grsn_layers": [
+        {
+          "layer": 0,
+          "threshold": 1.0,
+          "firing_rate": 0.03017578087747097,
+          "membrane_p05_p50_p95": [
+            -0.07914279401302338,
+            0.41250017285346985,
+            0.9225404858589172
+          ]
+        },
+        {
+          "layer": 1,
+          "threshold": 1.0,
+          "firing_rate": 0.03510742262005806,
+          "membrane_p05_p50_p95": [
+            0.009741189889609814,
+            0.3726252615451813,
+            0.9301238656044006
+          ]
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "mean_reward": -0.05871950089931488,
+      "resets": 0,
+      "tracking_rmse_mps": 0.9564887881278992,
+      "mean_forward_displacement_m": -0.1317121386528015,
+      "impulses_per_env": 0,
+      "velocity_loss": 0.7081174850463867,
+      "swap_loss": 5.904474258422852,
+      "auxiliary_loss": 6.612591743469238,
+      "ppo_loss": -0.06444568932056427,
+      "grsn_layers": [
+        {
+          "layer": 0,
+          "threshold": 1.0,
+          "firing_rate": 0.02993164025247097,
+          "membrane_p05_p50_p95": [
+            -0.09758800268173218,
+            0.4179233908653259,
+            0.9302191138267517
+          ]
+        },
+        {
+          "layer": 1,
+          "threshold": 1.0,
+          "firing_rate": 0.03256836161017418,
+          "membrane_p05_p50_p95": [
+            0.005173328332602978,
+            0.3765706419944763,
+            0.9278127551078796
+          ]
+        }
+      ],
+      "fusion_max_error": 0.0
+    }
+  ]
+}

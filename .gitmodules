@@ -1,0 +1,54 @@
+[submodule "third_party/upstream/HIMLoco"]
+	path = third_party/upstream/HIMLoco
+	url = https://github.com/InternRobotics/HIMLoco.git
+[submodule "third_party/upstream/WMP"]
+	path = third_party/upstream/WMP
+	url = https://github.com/bytedance/WMP.git
+[submodule "third_party/upstream/FullySNNforLeggedRobots"]
+	path = third_party/upstream/FullySNNforLeggedRobots
+	url = https://github.com/thisisnotahuman/FullySNNforLeggedRobots.git
+[submodule "third_party/upstream/extreme-parkour"]
+	path = third_party/upstream/extreme-parkour
+	url = https://github.com/chengxuxin/extreme-parkour.git
+[submodule "third_party/upstream/AMP_for_hardware"]
+	path = third_party/upstream/AMP_for_hardware
+	url = https://github.com/escontra/AMP_for_hardware.git
+[submodule "third_party/upstream/CaRe-BN"]
+	path = third_party/upstream/CaRe-BN
+	url = https://github.com/xuzijie32/CaRe-BN.git
+[submodule "third_party/upstream/GRSN-SNN"]
+	path = third_party/upstream/GRSN-SNN
+	url = https://github.com/StillWolf/GRSN-SNN.git
+[submodule "third_party/upstream/pop-spiking-deep-rl"]
+	path = third_party/upstream/pop-spiking-deep-rl
+	url = https://github.com/combra-lab/pop-spiking-deep-rl.git
+[submodule "third_party/upstream/spikingjelly"]
+	path = third_party/upstream/spikingjelly
+	url = https://github.com/fangwei123456/spikingjelly.git
+[submodule "third_party/upstream/swav"]
+	path = third_party/upstream/swav
+	url = https://github.com/facebookresearch/swav.git
+[submodule "third_party/upstream/EOLO"]
+	path = third_party/upstream/EOLO
+	url = https://github.com/SageCao1125/EOLO.git
+[submodule "third_party/upstream/rpg_esim"]
+	path = third_party/upstream/rpg_esim
+	url = https://github.com/uzh-rpg/rpg_esim.git
+[submodule "third_party/upstream/v2e"]
+	path = third_party/upstream/v2e
+	url = https://github.com/SensorsINI/v2e.git
+[submodule "third_party/upstream/isaac-sim-event-camera-plugin"]
+	path = third_party/upstream/isaac-sim-event-camera-plugin
+	url = https://github.com/spikelab-jhu/isaac-sim-event-camera-plugin.git
+[submodule "third_party/upstream/legged_gym"]
+	path = third_party/upstream/legged_gym
+	url = https://github.com/leggedrobotics/legged_gym.git
+[submodule "third_party/upstream/rsl_rl"]
+	path = third_party/upstream/rsl_rl
+	url = https://github.com/leggedrobotics/rsl_rl.git
+[submodule "third_party/upstream/dreamerv3"]
+	path = third_party/upstream/dreamerv3
+	url = https://github.com/danijar/dreamerv3.git
+[submodule "third_party/upstream/unitree_ros"]
+	path = third_party/upstream/unitree_ros
+	url = https://github.com/unitreerobotics/unitree_ros.git

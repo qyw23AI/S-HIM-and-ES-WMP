@@ -1,0 +1,98 @@
+{
+  "updates": [
+    {
+      "phase": "teacher_rollout",
+      "action_mse": 0.05132271721959114,
+      "yaw_mse": 0.05365855619311333
+    },
+    {
+      "phase": "teacher_rollout",
+      "action_mse": 0.0353788398206234,
+      "yaw_mse": 0.030817575752735138
+    },
+    {
+      "phase": "student_rollout",
+      "action_mse": 0.02490592934191227,
+      "yaw_mse": 0.03819318860769272
+    }
+  ],
+  "resets": 0,
+  "event_frames": 36,
+  "spike_pixels": 3305,
+  "student_config": {
+    "normalization": "care",
+    "threshold": 0.5,
+    "residual": "sew-add"
+  },
+  "visual_response": {
+    "active_event_pixels": 347,
+    "gru_max_abs_delta": 0.1616217941045761,
+    "action_max_abs_delta": 0.2452109009027481,
+    "layers": {
+      "blocks.0": {
+        "active_fraction": 0.6086273193359375,
+        "zero_frame_active_fraction": 0.51129150390625,
+        "max_abs_delta": 2.0
+      },
+      "blocks.1": {
+        "active_fraction": 0.7353973388671875,
+        "zero_frame_active_fraction": 0.6778564453125,
+        "max_abs_delta": 3.0
+      },
+      "blocks.2": {
+        "active_fraction": 0.5103759765625,
+        "zero_frame_active_fraction": 0.517822265625,
+        "max_abs_delta": 2.0
+      },
+      "blocks.3": {
+        "active_fraction": 0.63861083984375,
+        "zero_frame_active_fraction": 0.6429443359375,
+        "max_abs_delta": 3.0
+      },
+      "blocks.4": {
+        "active_fraction": 0.49200439453125,
+        "zero_frame_active_fraction": 0.490966796875,
+        "max_abs_delta": 2.0
+      },
+      "blocks.5": {
+        "active_fraction": 0.61572265625,
+        "zero_frame_active_fraction": 0.623291015625,
+        "max_abs_delta": 3.0
+      },
+      "blocks.6": {
+        "active_fraction": 0.52099609375,
+        "zero_frame_active_fraction": 0.52490234375,
+        "max_abs_delta": 2.0
+      },
+      "blocks.7": {
+        "active_fraction": 0.6602783203125,
+        "zero_frame_active_fraction": 0.66259765625,
+        "max_abs_delta": 3.0
+      },
+      "actor.1.input": {
+        "active_fraction": 0.5087890625,
+        "zero_frame_active_fraction": 0.5074462890625,
+        "max_abs_delta": 1.0
+      },
+      "actor.2.input": {
+        "active_fraction": 0.353271484375,
+        "zero_frame_active_fraction": 0.3642578125,
+        "max_abs_delta": 1.0
+      },
+      "actor.3.input": {
+        "active_fraction": 0.31640625,
+        "zero_frame_active_fraction": 0.32080078125,
+        "max_abs_delta": 1.0
+      }
+    }
+  },
+  "mode": "distill",
+  "status": "passed",
+  "terrain": "parkour",
+  "seed": 1,
+  "num_envs": 4,
+  "steps": 15,
+  "policy_hz": 50.0,
+  "event_hz": 10.0,
+  "reward_profile": "soft"
+}

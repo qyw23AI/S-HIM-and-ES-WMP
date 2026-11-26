@@ -1,0 +1,758 @@
+From fd57e7cf48d783dc25b979b5edbe5bdf92d5b51b Mon Sep 17 00:00:00 2001
+From: Codex <codex@users.noreply.local>
+Date: Thu, 26 Nov 2026 12:41:03 +0800
+Subject: [PATCH] Add analytical event flow and command-based Stop-and-Go
+
+---
+ graduation/evaluation/pareto.py        |  18 +++-
+ graduation/evaluation/stop_and_go.py   | 116 +++++++++++++++++++++++++
+ graduation/experiments/visual_suite.py |  98 ++++++++++++++++-----
+ graduation/sensors/events.py           |  34 ++++++++
+ graduation/sim/event_camera.py         |  59 +++++++++++--
+ graduation/sim/parkour.py              |  16 ++--
+ graduation/sim/wmp.py                  |  33 +++++++
+ scripts/eval_visual.py                 |  19 +++-
+ tests/test_event_motion.py             |  92 ++++++++++++++++++++
+ 9 files changed, 444 insertions(+), 41 deletions(-)
+ create mode 100644 graduation/evaluation/stop_and_go.py
+ create mode 100644 tests/test_event_motion.py
+
+diff --git a/graduation/evaluation/pareto.py b/graduation/evaluation/pareto.py
+index 6ab59fa..e359fda 100644
+--- a/graduation/evaluation/pareto.py
++++ b/graduation/evaluation/pareto.py
+@@ -7,10 +7,11 @@ import json
+ ENERGY_MODES = ("conservative_first_layer_mac", "strict_event_ac")
+ CONDITIONS = ("protocol_version", "terrain", "goal_distance_m", "event_threshold", "camera_hz",
+               "delay_frames", "frame_stride", "blur_pixels", "pause_at", "pause_steps", "resume_distance_m",
+-              "episode_seconds", "num_envs", "steps")
++              "episode_seconds", "num_envs", "steps", "flow_mode", "mask_events_on_pause",
++              "pause_trigger_distance_m", "stop_speed_mps")
+ ENERGY_COLUMNS = {mode: f"{mode}_pj_per_decision" for mode in ENERGY_MODES}
+ FIELDS = ("purpose", "method", "seed", *CONDITIONS, "successes", "finished_episodes", "censored_episodes",
+-          "timeout_episodes", "success_rate", "tracking_rmse_mps", "energy_pj_per_decision",
++          "timeout_episodes", "memory_control", "checkpoint_memory", "success_rate", "tracking_rmse_mps", "energy_pj_per_decision",
+           *ENERGY_COLUMNS.values(), "source")
+ 
+ 
+@@ -22,7 +23,13 @@ def pareto(rows, mode):
+         if (row["purpose"] == "formal" and row["protocol_version"] == 2 and row["finished_episodes"]
+                 and row[column] is not None):
+             conditions = tuple(row[key] for key in CONDITIONS)
+-            trials = groups[conditions][row["method"]]
++            method = row["method"]
++            if method == "event-spiking-wmp":
++                memory = row.get("checkpoint_memory") or "grsn"
++                control = row.get("memory_control") or "checkpoint"
++                if memory != "grsn" or control != "checkpoint":
++                    method = f"{method} ({memory}, {control})"
++            trials = groups[conditions][method]
+             # Repeated results for a seed form one seed-level point.
+             trials.setdefault(row["seed"], []).append(row)
+ 
+@@ -66,6 +73,11 @@ def summarize(reports, out):
+             continue
+         row = {key: payload.get(key) for key in FIELDS}
+         row["frame_stride"] = payload.get("frame_stride", 1)
++        row["flow_mode"] = payload.get("flow_mode", "random")
++        row["mask_events_on_pause"] = payload.get("mask_events_on_pause", False)
++        if payload.get("pause_steps") and "stop_and_go" not in payload:
++            # Old pauses forced actions to zero. Keep them in CSV under their own condition.
++            row["stop_speed_mps"] = "legacy_action_zero"
+         energy = payload.get("energy", {})
+         row["energy_pj_per_decision"] = energy.get("energy_pj_per_decision")
+         for mode, column in ENERGY_COLUMNS.items():
+diff --git a/graduation/evaluation/stop_and_go.py b/graduation/evaluation/stop_and_go.py
+new file mode 100644
+index 0000000..b9ad3a0
+--- /dev/null
++++ b/graduation/evaluation/stop_and_go.py
+@@ -0,0 +1,116 @@
++"""Command-only stopping and recovery for parallel course evaluation."""
++
++import torch
++
++
++class StopAndGo:
++    APPROACH, BRAKE, HOLD, RESUME = range(4)
++
++    def __init__(self, commands, pause_at, hold_steps, speed_limit, trigger_distance=None):
++        self.pause_at = pause_at
++        self.hold_steps = hold_steps
++        self.speed_limit = speed_limit
++        self.trigger_distance = trigger_distance
++        count = len(commands)
++        self.phase = torch.zeros(count, device=commands.device, dtype=torch.long)
++        self.hold = torch.zeros_like(self.phase)
++        self.episode = torch.zeros_like(self.phase)
++        self.trigger_step = torch.full_like(self.phase, -1)
++        self.settled_step = torch.full_like(self.phase, -1)
++        self.resume_step = torch.full_like(self.phase, -1)
++        self.original = torch.zeros_like(commands[:, :3])
++        self.resume_x = commands[:, 0].clone().zero_()
++        self.recovery = self.resume_x.clone()
++        self.peak_hold_speed = self.resume_x.clone()
++        self.stop_action_peak = self.resume_x.clone()
++        self.min_stop_speed = torch.full_like(self.resume_x, float("inf"))
++        self.trigger_offset = torch.full_like(self.resume_x, float("nan"))
++        self.raw_events = torch.zeros((count, 4), device=commands.device, dtype=torch.long)
++        self.delivered_events = torch.zeros_like(self.raw_events)
++        self.event_sites = torch.zeros_like(self.raw_events)
++        self.records = []
++
++    def prepare(self, step, commands, x, obstacle_x=None):
++        """Select and apply the command seen by both controller and simulator."""
++        if self.trigger_distance is None:
++            reached = step == self.pause_at
++        else:
++            gap = obstacle_x - x
++            reached = (step >= self.pause_at) & (gap >= 0) & (gap <= self.trigger_distance)
++        trigger = (self.phase == self.APPROACH) & reached
++        self.phase[trigger] = self.BRAKE
++        self.original[trigger] = commands[trigger, :3]
++        self.trigger_step[trigger] = step
++        if obstacle_x is not None:
++            self.trigger_offset[trigger] = (obstacle_x - x)[trigger]
++
++        release = (self.phase == self.HOLD) & (self.hold >= self.hold_steps)
++        self.phase[release] = self.RESUME
++        self.resume_step[release] = step
++        self.resume_x[release] = x[release]
++        commands[release, :3] = self.original[release]
++        stopping = (self.phase == self.BRAKE) | (self.phase == self.HOLD)
++        commands[stopping, :3] = 0.
++        return stopping, trigger | stopping | release
++
++    def events(self, frame, stopping, mask):
++        """Count raw and delivered events per phase and optionally mask stop frames."""
++        rows = torch.arange(len(frame), device=frame.device)
++        raw = frame.flatten(1).count_nonzero(dim=1)
++        self.raw_events[rows, self.phase] += raw
++        self.event_sites[rows, self.phase] += frame[0].numel()
++        self.delivered_events[rows, self.phase] += torch.where(stopping & mask, 0, raw)
++        return frame.masked_fill(stopping[:, None, None, None], 0) if mask else frame
++
++    def advance(self, step, end_x, speed, done, action):
++        stopping = (self.phase == self.BRAKE) | (self.phase == self.HOLD)
++        settled = stopping & (speed <= self.speed_limit) & ~done
++        self.min_stop_speed[stopping] = torch.minimum(self.min_stop_speed[stopping], speed[stopping])
++        first = settled & (self.settled_step < 0)
++        self.settled_step[first] = step + 1
++        held = settled & (self.phase == self.HOLD)
++        self.hold[held] += 1
++        action_peak = action[stopping].abs().amax(dim=1)
++        self.stop_action_peak[stopping] = torch.maximum(self.stop_action_peak[stopping], action_peak)
++        self.hold[stopping & ~settled] = 0
++        self.peak_hold_speed[settled] = torch.maximum(self.peak_hold_speed[settled], speed[settled])
++        self.peak_hold_speed[stopping & ~settled] = 0.
++        self.phase[settled] = self.HOLD
++        self.phase[stopping & ~settled] = self.BRAKE
++        resumed = self.phase == self.RESUME
++        self.recovery[resumed] = end_x[resumed] - self.resume_x[resumed]
++        self._record(done, completed=True)
++        self.episode += done
++        self.phase[done] = self.APPROACH
++        self.hold[done] = 0
++        self.trigger_step[done] = self.settled_step[done] = self.resume_step[done] = -1
++        self.trigger_offset[done] = float("nan")
++        self.min_stop_speed[done] = float("inf")
++        self.peak_hold_speed[done] = self.recovery[done] = self.stop_action_peak[done] = 0.
++        self.raw_events[done] = self.delivered_events[done] = self.event_sites[done] = 0
++
++    def _record(self, selected, completed):
++        for index in (selected & (self.trigger_step >= 0)).nonzero().flatten().tolist():
++            stages = {}
++            for phase, name in enumerate(("approach", "brake", "hold", "resume")):
++                sites = int(self.event_sites[index, phase])
++                stages[name] = {"sampled_sites": sites,
++                                "raw_density": int(self.raw_events[index, phase]) / sites if sites else None,
++                                "delivered_density": int(self.delivered_events[index, phase]) / sites if sites else None}
++            offset = float(self.trigger_offset[index])
++            resume = int(self.resume_step[index])
++            min_speed = float(self.min_stop_speed[index])
++            self.records.append({
++                "env": index, "episode": int(self.episode[index]), "completed_physical_episode": completed,
++                "trigger_step": int(self.trigger_step[index]), "trigger_distance_m": offset if offset == offset else None,
++                "original_command": self.original[index].tolist(), "settled_step": int(self.settled_step[index]),
++                "resume_step": resume, "hold_start_step": resume - self.hold_steps if resume >= 0 else None,
++                "min_planar_speed_mps": min_speed if min_speed < float("inf") else None,
++                "hold_peak_planar_speed_mps": float(self.peak_hold_speed[index]),
++                "stopping_action_max_abs": float(self.stop_action_peak[index]),
++                "recovery_distance_m": float(self.recovery[index]), "event_density": stages,
++            })
++
++    def finish(self):
++        self._record(self.trigger_step >= 0, completed=False)
++        return self.records
+diff --git a/graduation/experiments/visual_suite.py b/graduation/experiments/visual_suite.py
+index f16ae7f..d8bc69c 100644
+--- a/graduation/experiments/visual_suite.py
++++ b/graduation/experiments/visual_suite.py
+@@ -13,6 +13,7 @@ def run(args):
+ 
+     from graduation.evaluation.energy import SynapticMeter
+     from graduation.evaluation.episodes import CourseEpisodes
++    from graduation.evaluation.stop_and_go import StopAndGo
+     from graduation.methods.es_parkour.student import ESStudent, es_spike_inputs
+     from graduation.methods.es_wmp.student import EventSpikingWMP
+     from graduation.methods.s_him.policy import SHIM, shim_spike_inputs
+@@ -31,7 +32,7 @@ def run(args):
+         obs, _ = adapter.reset()
+         core = env.core
+         period = core.cfg.depth.update_interval
+-        camera = EventCamera(env, args.threshold, args.delay_frames, args.blur, args.seed)
++        camera = EventCamera(env, args.threshold, args.delay_frames, args.blur, args.seed, args.flow_mode)
+         count = args.num_envs
+         method = args.method
+         event_inputs = set()
+@@ -49,6 +50,7 @@ def run(args):
+                 model.load_state_dict(saved["student"])
+                 model.eval()
+                 model = model.fused()
++                model.actor.static_projection = not args.legacy_actor_projection
+                 state, visual = model.initial(count)
+                 spike_inputs = model.spike_layers()
+                 event_inputs = {"convs.0"}
+@@ -71,6 +73,7 @@ def run(args):
+                              grsn_bias=config.get("grsn_bias")).to(env.device)
+                 model.load_state_dict(saved["model"])
+                 model = model.fused()
++                model.actor.static_projection = not args.legacy_actor_projection
+                 spike_inputs = shim_spike_inputs(model)
+                 histories = None
+                 converter = shim_observation_converter(core)
+@@ -78,29 +81,56 @@ def run(args):
+         widths = list(env.terrain.column_types) if env.terrain is not None else ["flat"]
+         terrain_id = core.terrain_types if env.terrain is not None else torch.zeros_like(core.terrain_levels)
+         episodes = CourseEpisodes(core.root_states[:, 0], terrain_id, core.terrain_levels, widths, args.goal_distance)
+-        after_pause = torch.zeros(count, device=env.device)
++        stop = StopAndGo(core.commands, args.pause_at, args.pause_steps, args.stop_speed,
++                         args.pause_trigger_distance) if args.pause_steps else None
++        obstacle_offsets = None
++        if args.pause_trigger_distance is not None:
++            from graduation.sim.parkour import FIRST_OBSTACLE_X, SPAWN_X
++
++            obstacle_offsets = torch.tensor(FIRST_OBSTACLE_X, device=env.device)[terrain_id] - SPAWN_X
+         terminal = torch.zeros(count, device=env.device, dtype=torch.bool)
+         active_pixels = 0
+         held_depth = None
+-        first_failure = torch.zeros_like(terminal)
++        source_steps = None
++        frame_clock = []
++        rssm_clock = []
+         with torch.no_grad(), meter if meter else nullcontext():
+             for step in range(args.steps):
+                 due = step % (period * args.frame_stride) == 0
+-                prop = body_observation(env, obs)
++                stopping = torch.zeros_like(terminal)
++                policy_obs = obs
++                if stop:
++                    obstacle_x = core.env_origins[:, 0] + obstacle_offsets if obstacle_offsets is not None else None
++                    stopping, command_override = stop.prepare(step, core.commands, core.root_states[:, 0], obstacle_x)
++                    command_slice = slice(core.privileged_dim + 6, core.privileged_dim + 9)
++                    policy_obs = obs.clone()
++                    policy_obs[command_override, command_slice] = core.commands[command_override, :3] * core.commands_scale
++                prop = body_observation(env, policy_obs)
+                 if method == "wmp":
+                     if due:
+                         held_depth = camera.depth(newest=False)[..., None]
+-                    action, _ = act_wmp(obs, step, image_override=held_depth)
++                        source_steps = camera.source_steps.clone()
++                        frame_clock.append({"control_step": step, "source_steps": source_steps.tolist()})
++                    if step % teacher.period == 0:
++                        rssm_clock.append({"control_step": step, "teacher_depth_source_steps": source_steps.tolist()})
++                    action, _ = act_wmp(policy_obs, step, image_override=held_depth)
+                 elif method == "event-spiking-wmp":
+                     if due:
+                         event = camera.capture()
++                        frame_clock.append({"control_step": step, "source_steps": camera.source_steps.tolist()})
++                        if stop:
++                            event = stop.events(event, stopping, args.mask_events_on_pause)
+                         active_pixels += int(event.sum())
+                         visual = model.encode(event)
+-                    action, _, state = model(prop, visual, state)
++                    memory_input = torch.zeros_like(state) if args.memory_control == "zero-state" else state
++                    action, _, state = model(prop, visual, memory_input)
+                 elif method == "es-parkour":
+                     proprio = torch.cat((prop[:, :8], prop[:, 9:]), dim=1)
+                     if due:
+                         event = camera.capture()
++                        frame_clock.append({"control_step": step, "source_steps": camera.source_steps.tolist()})
++                        if stop:
++                            event = stop.events(event, stopping, args.mask_events_on_pause)
+                         active_pixels += int(event.sum())
+                         state = model.observe(event, proprio, state)
+                     action, _ = model(proprio, state)
+@@ -115,15 +145,11 @@ def run(args):
+                     action = model(histories.flatten(1))
+                 if not torch.isfinite(action).all():
+                     raise RuntimeError("Nonfinite visual benchmark action")
+-                paused = args.pause_at <= step < args.pause_at + args.pause_steps
+-                executed = torch.zeros_like(action) if paused else action
+                 target_speed = core.commands[:, 0].clone()
+-                old_x = core.root_states[:, 0].clone()
+-                obs, _, _, done, _, *_ = adapter.step(executed)
++                obs, _, _, done, _, *_ = adapter.step(action)
+                 terminal = done
+-                first_failure |= env.transition_failed
+                 if method == "wmp":
+-                    teacher.advance(executed, done)
++                    teacher.advance(action, done)
+                 elif method == "event-spiking-wmp":
+                     visual = visual * (~done[:, None])
+                     state = state * (~done[:, None])
+@@ -132,10 +158,11 @@ def run(args):
+                 camera.reset(done)
+                 if held_depth is not None and done.any():
+                     held_depth = held_depth.masked_fill(done[:, None, None, None], .5)
+-                episodes.advance(env.transition_x, target_speed - env.transition_speed, not paused,
++                    source_steps = source_steps.masked_fill(done, -1)
++                episodes.advance(env.transition_x, target_speed - env.transition_speed, ~stopping,
+                                  env.transition_failed, done, core.root_states[:, 0], terrain_id, core.terrain_levels)
+-                if args.pause_steps and step >= args.pause_at + args.pause_steps:
+-                    after_pause += torch.where((~done) & (~first_failure), env.transition_x - old_x, 0.)
++                if stop:
++                    stop.advance(step, env.transition_x, env.transition_planar_speed, done, action)
+         episode_rows = episodes.finish()
+         n_speed = sum(row["speed_samples"] for row in episode_rows)
+         n_finished = sum(row["completed"] for row in episode_rows)
+@@ -143,7 +170,12 @@ def run(args):
+         report = {"status": "passed", "protocol_version": 2, "method": method, "purpose": args.purpose, "seed": args.seed,
+                   "terrain": args.terrain, "num_envs": count, "steps": args.steps,
+                   "goal_distance_m": args.goal_distance, "checkpoint": str(args.checkpoint),
+-                  "event_threshold": args.threshold,
++                  "event_threshold": args.threshold, "flow_mode": args.flow_mode,
++                  "memory_control": args.memory_control,
++                  "checkpoint_memory": saved["config"].get("memory", "grsn") if method == "event-spiking-wmp" else None,
++                  "mask_events_on_pause": args.mask_events_on_pause,
++                  "pause_trigger_distance_m": args.pause_trigger_distance,
++                  "stop_speed_mps": args.stop_speed if stop else None,
+                   "delay_frames": args.delay_frames, "frame_stride": args.frame_stride,
+                   "camera_hz": 1 / (period * args.frame_stride * env.step_dt),
+                   "blur_pixels": args.blur, "pause_at": args.pause_at,
+@@ -156,9 +188,35 @@ def run(args):
+                   "timeout_episodes": sum(row["outcome"] == "timeout" for row in episode_rows),
+                   "falls": sum(row["fall"] for row in episode_rows),
+                   "active_event_pixels": active_pixels, "episodes": episode_rows}
+-        if args.pause_steps:
+-            report["post_pause_progress_m"] = after_pause.cpu().tolist()
+-            report["post_pause_resumed_envs"] = int((after_pause >= args.resume_distance).sum())
++        report["camera_clock"] = {
++            "control_dt_s": env.step_dt,
++            "native_depth_period_control_steps": period,
++            "delivery_period_control_steps": period * args.frame_stride,
++            "delay_unit": "delivered_samples",
++            "invalid_source_step": -1,
++            "teacher_depth_buffer_index": -2 if method == "wmp" else None,
++            "student_depth_buffer_index": -1 if method in ("es-parkour", "event-spiking-wmp") else None,
++            "rssm_period_control_steps": teacher.period if method == "wmp" else None,
++            "teacher_depth_deliveries": frame_clock if method == "wmp" else [],
++            "student_event_deliveries": frame_clock if method in ("es-parkour", "event-spiking-wmp") else [],
++            "rssm_updates": rssm_clock,
++        }
++        if stop:
++            records = stop.finish()
++            outcomes = {(row["env"], row["episode"]): row["outcome"] for row in episode_rows}
++            recovery = [0.] * count
++            resumed = set()
++            for record in records:
++                index = record["env"]
++                record["course_outcome"] = outcomes.get((index, record["episode"]))
++                recovery[index] = record["recovery_distance_m"]
++                if record["resume_step"] >= 0 and record["recovery_distance_m"] >= args.resume_distance:
++                    resumed.add(index)
++            report["stop_and_go"] = records
++            report["stop_attempts"] = len(records)
++            report["stop_state_resumed_envs"] = len({row["env"] for row in records if row["resume_step"] >= 0})
++            report["post_pause_progress_m"] = recovery
++            report["post_pause_resumed_envs"] = len(resumed)
+             report["resume_distance_m"] = args.resume_distance
+         if observation_probe is not None:
+             first_prop, physical_commands, corrected = observation_probe
+@@ -175,6 +233,6 @@ def run(args):
+         if meter:
+             report["energy"] = meter.report(count * args.steps, 1 / env.step_dt)
+         (args.out / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
+-        print("VALIDATION", {key: val for key, val in report.items() if key not in ("episodes", "energy")}, flush=True)
++        print("VALIDATION", {key: val for key, val in report.items() if key not in ("episodes", "energy", "camera_clock", "stop_and_go")}, flush=True)
+     finally:
+         env.close()
+diff --git a/graduation/sensors/events.py b/graduation/sensors/events.py
+index aa5910b..fe537a9 100644
+--- a/graduation/sensors/events.py
++++ b/graduation/sensors/events.py
+@@ -28,3 +28,37 @@ def event_frame(depth_m, threshold=0.08, displacement=1.0, flow_pixels=None, gen
+         raise ValueError("Optical flow must have shape [B,2,H,W]")
+     change = -(gradient * flow_pixels).sum(dim=1)
+     return torch.stack((change >= threshold, change <= -threshold), dim=1).to(depth.dtype)
++
++
++def analytical_flow(depth, intrinsics, position, rotation, previous_depth, previous_intrinsics,
++                    previous_position, previous_rotation, near, far):
++    """Return forward image displacement on the current grid for a rigid scene.
++
++    Depth is optical Z. Rotations map ROS optical coordinates to world coordinates.
++    Pixels use the Isaac camera convention of half-integer centers.
++    """
++    batch, height, width = depth.shape
++    y, x = torch.meshgrid(torch.arange(height, device=depth.device, dtype=depth.dtype) + .5,
++                          torch.arange(width, device=depth.device, dtype=depth.dtype) + .5, indexing="ij")
++    pixels = torch.stack((x, y, torch.ones_like(x))).reshape(3, -1).expand(batch, -1, -1)
++    valid = torch.isfinite(depth) & (depth >= near) & (depth < far)
++    z = torch.where(valid, depth, 0.).reshape(batch, 1, -1)
++    current_points = torch.linalg.solve(intrinsics, pixels) * z
++    inverse = previous_rotation.transpose(1, 2)
++    previous_points = inverse @ (rotation @ current_points + (position - previous_position).unsqueeze(-1))
++    projected = previous_intrinsics @ previous_points
++    previous_z = projected[:, 2]
++    previous_xy = projected[:, :2] / previous_z[:, None].clamp_min(1e-6)
++    px, py = previous_xy.unbind(1)
++    in_view = (px >= .5) & (px <= width - .5) & (py >= .5) & (py <= height - .5)
++    grid = torch.stack((2 * px / width - 1, 2 * py / height - 1), dim=-1).reshape(batch, height, width, 2)
++    sampled = F.grid_sample(previous_depth[:, None], grid, mode="nearest", align_corners=False).flatten(1)
++    visible = torch.isfinite(sampled) & (sampled >= near) & (sampled < far)
++    # Reject points hidden behind the preceding depth surface; allow a small rasterization margin.
++    visible &= previous_z <= sampled + (.02 + .02 * sampled)
++    valid = valid.flatten(1) & (previous_z >= near) & (previous_z < far) & in_view & visible
++    stationary = ((position == previous_position).all(dim=1)
++                  & (rotation == previous_rotation).all(dim=(1, 2))
++                  & (intrinsics == previous_intrinsics).all(dim=(1, 2)))
++    flow = pixels[:, :2] - previous_xy
++    return torch.where((valid & ~stationary[:, None])[:, None], flow, 0.).reshape(batch, 2, height, width)
+diff --git a/graduation/sim/event_camera.py b/graduation/sim/event_camera.py
+index 702564b..2fe00d4 100644
+--- a/graduation/sim/event_camera.py
++++ b/graduation/sim/event_camera.py
+@@ -1,37 +1,78 @@
+ """Synchronized camera sampling and controlled observation perturbations."""
++
+ from collections import deque
++from dataclasses import dataclass
+ 
+ import torch
+ from torch.nn import functional as F
+ 
+-from graduation.sensors.events import event_frame
++from graduation.sensors.events import analytical_flow, event_frame
++
++
++@dataclass
++class CameraSample:
++    depth: torch.Tensor
++    step: torch.Tensor
++    geometry: tuple | None = None
++
++    def invalidate(self, done):
++        self.depth[done] = .5
++        self.step[done] = -1
+ 
+ 
+ class EventCamera:
+-    def __init__(self, env, threshold=0.08, delay_frames=0, blur=1, seed=1):
++    def __init__(self, env, threshold=0.08, delay_frames=0, blur=1, seed=1, flow_mode="random"):
+         self.env = env
+         self.threshold = threshold
+         self.delay_frames = delay_frames
+         self.blur = blur
++        self.flow_mode = flow_mode
+         self.frames = deque(maxlen=delay_frames + 1)
++        self.previous = None
++        self.source_steps = None
+         self.generator = torch.Generator(device=env.device).manual_seed(seed + 140)
+ 
+-    def depth(self, newest=True):
++    def _sample(self, newest, geometry=False):
+         index = -1 if newest else -2
+         depth = self.env.core.depth_buffer[:, index].clone()
+         if self.blur > 1:
+             depth = F.avg_pool2d(depth[:, None], self.blur, stride=1, padding=self.blur // 2,
+                                  count_include_pad=False)[:, 0]
+-        self.frames.append(depth)
+-        return self.frames[0] if len(self.frames) > self.delay_frames else torch.full_like(depth, .5)
++        stamps = getattr(self.env, "depth_source_steps", None)
++        step = stamps[:, index].clone() if stamps is not None else torch.full(
++            (len(depth),), -1, dtype=torch.long, device=depth.device)
++        optical = self.env.optical_sample if geometry else None
++        self.frames.append(CameraSample(depth, step, optical))
++        if len(self.frames) > self.delay_frames:
++            sample = self.frames[0]
++        else:
++            sample = CameraSample(torch.full_like(depth, .5), torch.full_like(step, -1))
++        self.source_steps = sample.step
++        return sample
++
++    def depth(self, newest=True):
++        return self._sample(newest).depth
+ 
+     def capture(self):
+         core = self.env.core
+         near, far = core.cfg.depth.near_clip, core.cfg.depth.far_clip
+-        depth_m = (self.depth() + .5) * (far - near) + near
+-        return event_frame(depth_m, threshold=self.threshold, generator=self.generator)
++        analytic = self.flow_mode == "analytical"
++        sample = self._sample(newest=True, geometry=analytic)
++        depth_m = (sample.depth + .5) * (far - near) + near
++        if not analytic:
++            return event_frame(depth_m, threshold=self.threshold, generator=self.generator)
++
++        previous, self.previous = self.previous, sample
++        if previous is None or previous.geometry is None or sample.geometry is None:
++            return depth_m.new_zeros((len(depth_m), 2, *depth_m.shape[-2:]))
++        flow = analytical_flow(*sample.geometry, *previous.geometry, near, far)
++        valid_pair = (previous.step >= 0) & (sample.step > previous.step)
++        flow = torch.where(valid_pair[:, None, None, None], flow, 0.)
++        return event_frame(depth_m, threshold=self.threshold, flow_pixels=flow)
+ 
+     def reset(self, done):
+         if done.any():
+-            self.frames = deque((frame.masked_fill(done[:, None, None], .5) for frame in self.frames),
+-                                maxlen=self.delay_frames + 1)
++            for sample in self.frames:
++                sample.invalidate(done)
++            if self.previous is not None:
++                self.previous.invalidate(done)
+diff --git a/graduation/sim/parkour.py b/graduation/sim/parkour.py
+index e8a2d59..50be832 100644
+--- a/graduation/sim/parkour.py
++++ b/graduation/sim/parkour.py
+@@ -5,6 +5,8 @@ from wmp_lab.heightfield import SubTerrain
+ from wmp_lab.terrain import Terrain
+ 
+ KINDS = ("gap", "stairup", "hurdle", "parkour")
++FIRST_OBSTACLE_X = (2.15, 2.10, 2.20, 2.00)
++SPAWN_X = .80
+ 
+ 
+ class ParkourTerrain(Terrain):
+@@ -12,7 +14,7 @@ class ParkourTerrain(Terrain):
+ 
+     def __init__(self, cfg, num_robots):
+         super().__init__(cfg, num_robots)
+-        local_x = np.array([1.4, 2.4, 3.2, 4.0, 4.8, 5.5, 6.2]) - .8
++        local_x = np.array([1.4, 2.4, 3.2, 4.0, 4.8, 5.5, 6.2]) - SPAWN_X
+         points = np.zeros((cfg.num_rows, cfg.num_cols, len(local_x), 2), dtype=np.float32)
+         points[..., 0] = local_x
+         for level in range(cfg.num_rows):
+@@ -34,18 +36,18 @@ class ParkourTerrain(Terrain):
+             return round(meters / field.vertical_scale)
+ 
+         if j == 0:
+-            for start in (2.15, 3.55, 4.95):
++            for start in (FIRST_OBSTACLE_X[0], 3.55, 4.95):
+                 raw[x(start):x(start + 0.12 + difficulty * 0.52)] = height(-0.65)
+         elif j == 1:
+             for step in range(5):
+-                start = 2.1 + step * 0.32
++                start = FIRST_OBSTACLE_X[1] + step * 0.32
+                 raw[x(start):x(start + 0.32)] = height((min(step, 4 - step) + 1) * (.05 + .09 * difficulty))
+         elif j == 2:
+-            for start in (2.2, 3.5, 4.8):
++            for start in (FIRST_OBSTACLE_X[2], 3.5, 4.8):
+                 raw[x(start):x(start + 0.25)] = height(.07 + .22 * difficulty)
+         else:
+-            raw[x(2):x(5.7)] = height(-0.55)
+-            for index, start in enumerate((2.0, 2.8, 3.6, 4.4, 5.2)):
++            raw[x(FIRST_OBSTACLE_X[3]):x(5.7)] = height(-0.55)
++            for index, start in enumerate((FIRST_OBSTACLE_X[3], 2.8, 3.6, 4.4, 5.2)):
+                 y = mid + x((-1) ** index * (.08 + .20 * difficulty))
+                 half = x(.40 - .12 * difficulty)
+                 raw[x(start):x(start + .52 - .10 * difficulty), y - half:y + half] = height(.03 + .11 * difficulty)
+@@ -57,4 +59,4 @@ class ParkourTerrain(Terrain):
+ 
+     def add_terrain_to_map(self, terrain, row, col):
+         super().add_terrain_to_map(terrain, row, col)
+-        self.env_origins[row, col] = [row * self.env_length + 0.8, (col + 0.5) * self.env_width, 0.0]
++        self.env_origins[row, col] = [row * self.env_length + SPAWN_X, (col + 0.5) * self.env_width, 0.0]
+diff --git a/graduation/sim/wmp.py b/graduation/sim/wmp.py
+index 5ba4502..57b8e03 100644
+--- a/graduation/sim/wmp.py
++++ b/graduation/sim/wmp.py
+@@ -41,14 +41,47 @@ def make_visual_env(args, *, reward_profile=None, capture_outcomes=False):
+     cfg.camera_backend = "raycast"
+     if capture_outcomes:
+         import torch
++        from isaaclab.utils.math import matrix_from_quat
++
++        analytic = getattr(args, "flow_mode", "random") == "analytical"
+ 
+         class EvaluationEnv(WMPEnv):
++            optical_sample = None
++            depth_source_steps = None
++
++            def _get_observations(self):
++                core = self.core
++                interval = core.cfg.depth.update_interval
++                due = core.global_counter % interval == 0
++                fresh = self.depth_age < interval
++                observation = super()._get_observations()
++                if due:
++                    if self.depth_source_steps is None:
++                        self.depth_source_steps = torch.full(
++                            core.depth_buffer.shape[:2], -1, dtype=torch.long, device=self.device)
++                    self.depth_source_steps[:, -2] = self.depth_source_steps[:, -1]
++                    self.depth_source_steps[fresh, -2] = core.global_counter
++                    self.depth_source_steps[:, -1] = core.global_counter
++                    if analytic:
++                        data = self.camera.data
++                        ids = self.camera_env_ids
++                        self.optical_sample = (data.output["distance_to_image_plane"][ids, ..., 0].clone(),
++                                               data.intrinsic_matrices[ids].clone(), data.pos_w[ids].clone(),
++                                               matrix_from_quat(data.quat_w_ros[ids]))
++                return observation
++
++            def _reset_idx(self, ids):
++                super()._reset_idx(ids)
++                if self.depth_source_steps is not None:
++                    self.depth_source_steps[self.camera_lookup[ids]] = -1
++
+             def _get_dones(self):
+                 terminated, timeout = super()._get_dones()
+                 core = self.core
+                 # Isaac resets before returning observations. Capture this transition here.
+                 self.transition_x = core.root_states[:, 0].clone()
+                 self.transition_speed = core.base_lin_vel[:, 0].clone()
++                self.transition_planar_speed = torch.linalg.vector_norm(core.base_lin_vel[:, :2], dim=1)
+                 # WMP masks termination on timeout. Recover simultaneous failures.
+                 collision = torch.any(torch.norm(
+                     core.contact_forces[:, core.termination_contact_indices, :], dim=-1) > 1., dim=1)
+diff --git a/scripts/eval_visual.py b/scripts/eval_visual.py
+index ad4705c..9bbbe83 100644
+--- a/scripts/eval_visual.py
++++ b/scripts/eval_visual.py
+@@ -27,11 +27,17 @@ def main():
+     parser.add_argument("--episode-seconds", type=float, default=20)
+     parser.add_argument("--goal-distance", type=float, default=3.)
+     parser.add_argument("--threshold", type=float, default=.08)
++    parser.add_argument("--flow-mode", choices=("random", "analytical"), default="random")
++    parser.add_argument("--mask-events-on-pause", action="store_true")
++    parser.add_argument("--pause-trigger-distance", type=float, help="Approach distance to the first parkour obstacle")
++    parser.add_argument("--stop-speed", type=float, default=.15, help="Planar speed limit in m/s for the hold")
++    parser.add_argument("--memory-control", choices=("checkpoint", "zero-state"), default="checkpoint")
++    parser.add_argument("--legacy-actor-projection", action="store_true")
+     parser.add_argument("--delay-frames", type=int, default=0)
+     parser.add_argument("--frame-stride", type=int, default=1, help="Retain every Nth native camera frame")
+     parser.add_argument("--blur", type=int, default=1)
+-    parser.add_argument("--pause-at", type=int, default=5)
+-    parser.add_argument("--pause-steps", type=int, default=0)
++    parser.add_argument("--pause-at", type=int, default=5, help="Trigger step or earliest distance-trigger step")
++    parser.add_argument("--pause-steps", type=int, default=0, help="Consecutive control steps inside the stop speed band")
+     parser.add_argument("--resume-distance", type=float, default=.25)
+     parser.add_argument("--seed", type=int, default=1)
+     parser.add_argument("--energy", action="store_true")
+@@ -43,6 +49,15 @@ def main():
+         parser.error("use an odd blur width and nonnegative delays")
+     if args.pause_steps and args.pause_at + args.pause_steps >= args.steps:
+         parser.error("pause validation requires a subsequent observation interval")
++    if not 0 < args.stop_speed < float("inf"):
++        parser.error("--stop-speed must be positive and finite")
++    if args.pause_trigger_distance is not None and (
++            args.terrain != "parkour" or not args.pause_steps or not 0 < args.pause_trigger_distance < float("inf")):
++        parser.error("Distance-triggered stopping requires parkour terrain, a positive distance and --pause-steps")
++    if args.mask_events_on_pause and (not args.pause_steps or args.method not in ("es-parkour", "event-spiking-wmp")):
++        parser.error("--mask-events-on-pause requires an event policy and --pause-steps")
++    if args.memory_control != "checkpoint" and args.method != "event-spiking-wmp":
++        parser.error("--memory-control applies to event-spiking-wmp")
+     if args.method == "s-him":
+         sys.path.append(str(HIM / "isaaclab_migration"))
+     launch(AppLauncher, args, run)
+diff --git a/tests/test_event_motion.py b/tests/test_event_motion.py
+new file mode 100644
+index 0000000..5e90959
+--- /dev/null
++++ b/tests/test_event_motion.py
+@@ -0,0 +1,92 @@
++"""Projection and per-environment stop/reset contracts."""
++
++import unittest
++from types import SimpleNamespace
++
++import torch
++
++from graduation.evaluation.stop_and_go import StopAndGo
++from graduation.sensors.events import analytical_flow, event_frame
++from graduation.sim.event_camera import EventCamera
++
++
++class EventMotionTest(unittest.TestCase):
++    def setUp(self):
++        self.k = torch.tensor([[[6., 0., 3.5], [0., 6., 3.5], [0., 0., 1.]]])
++        self.pos = torch.zeros(1, 3)
++        self.rot = torch.eye(3)[None]
++        self.depth = torch.full((1, 7, 7), 2.)
++
++    def flow(self, pos, rot, depth=None):
++        depth = self.depth if depth is None else depth
++        return analytical_flow(depth, self.k, pos, rot, depth, self.k, self.pos, self.rot, .1, 5.)
++
++    def test_stationary_flow_and_events_are_exactly_zero_at_depth_edges(self):
++        depth = self.depth.clone()
++        depth[:, :, :3] = 1.
++        flow = self.flow(self.pos, self.rot, depth)
++        self.assertEqual(int(flow.count_nonzero()), 0)
++        self.assertEqual(int(event_frame(depth, flow_pixels=flow).count_nonzero()), 0)
++
++    def test_horizontal_translation_has_expected_signed_displacement(self):
++        flow = self.flow(torch.tensor([[.2, 0., 0.]]), self.rot)
++        torch.testing.assert_close(flow[0, :, 3, 3], torch.tensor([-.6, 0.]), atol=1e-6, rtol=0)
++        self.assertEqual(int(flow[:, :, :, -1].count_nonzero()), 0)
++        clipped = torch.full_like(self.depth, 5.)
++        self.assertEqual(int(self.flow(torch.tensor([[.2, 0., 0.]]), self.rot, clipped).count_nonzero()), 0)
++
++    def test_optical_roll_reprojects_without_camera_translation(self):
++        roll = torch.tensor([[[0., -1., 0.], [1., 0., 0.], [0., 0., 1.]]])
++        flow = self.flow(self.pos, roll)
++        torch.testing.assert_close(flow[0, :, 3, 4], torch.tensor([1., -1.]), atol=1e-6, rtol=0)
++
++    def test_async_reset_clears_only_selected_delayed_history(self):
++        depth = self.depth.repeat(2, 1, 1)
++        depth[:, :, :3] = 1.
++        fake = SimpleNamespace(device="cpu", core=SimpleNamespace(
++            depth_buffer=((depth - .1) / 4.9 - .5)[:, None].repeat(1, 2, 1, 1),
++            cfg=SimpleNamespace(depth=SimpleNamespace(near_clip=.1, far_clip=5.))))
++        camera = EventCamera(fake, threshold=.01, delay_frames=1, flow_mode="analytical")
++        k = self.k.repeat(2, 1, 1)
++        rot = self.rot.repeat(2, 1, 1)
++
++        def capture(step, x):
++            pos = torch.tensor([[x, 0., 0.], [x, 0., 0.]])
++            fake.depth_source_steps = torch.full((2, 2), step)
++            fake.optical_sample = (depth, k, pos, rot)
++            return camera.capture()
++
++        capture(0, 0.)
++        capture(5, .15)
++        camera.reset(torch.tensor([True, False]))
++        events = capture(10, .30)
++        self.assertEqual(float(events[0].sum()), 0)
++        self.assertGreater(float(events[1].sum()), 0)
++        self.assertEqual(camera.source_steps.tolist(), [-1, 5])
++        self.assertEqual(float(capture(15, .45)[0].sum()), 0)
++
++    def test_stop_requires_consecutive_stationary_steps_and_restores_command(self):
++        commands = torch.tensor([[.8, .1, .2], [.6, 0., 0.]])
++        stop = StopAndGo(commands, 0, 2, .1, trigger_distance=.5)
++        x = torch.tensor([.6, .2])
++        obstacle = torch.ones(2)
++        done = torch.zeros(2, dtype=torch.bool)
++        action = torch.ones(2, 12)
++        stop.prepare(0, commands, x, obstacle)
++        self.assertEqual(commands[0].tolist(), [0., 0., 0.])
++        for step, speed in enumerate((.16, .08, .12, .09, .07, .06)):
++            stop.prepare(step, commands, x, obstacle)
++            stop.advance(step, x, torch.tensor([speed, .2]), done, action)
++        stopping, _ = stop.prepare(6, commands, x, obstacle)
++        self.assertFalse(bool(stopping.any()))
++        torch.testing.assert_close(commands[0], torch.tensor([.8, .1, .2]))
++        stop.advance(6, x + .1, torch.tensor([.13, .2]), done, action)
++        row, = stop.finish()
++        self.assertEqual(row["resume_step"], 6)
++        self.assertAlmostEqual(row["recovery_distance_m"], .1, places=5)
++        self.assertLessEqual(row["hold_peak_planar_speed_mps"], .1)
++        self.assertEqual(row["stopping_action_max_abs"], 1.)
++
++
++if __name__ == "__main__":
++    unittest.main()
+-- 
+2.34.1
+
