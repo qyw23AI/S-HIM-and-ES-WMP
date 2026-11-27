@@ -90,7 +90,8 @@ class HIMLabEnv(DirectRLEnv):
                 from .task_gait.terrain import GentleTerrain
                 Terrain = GentleTerrain
             from .terrain.heightfield import convert_heightfield_to_trimesh
-            self.terrain=Terrain(c.terrain,self.num_envs)
+            terrain_factory=getattr(c.terrain, "terrain_factory", Terrain)
+            self.terrain=terrain_factory(c.terrain,self.num_envs)
             if not hasattr(self.terrain,'vertices'):
                 self.terrain.vertices,self.terrain.triangles=convert_heightfield_to_trimesh(self.terrain.heightsamples,c.terrain.horizontal_scale,c.terrain.vertical_scale,c.terrain.slope_treshold)
             vertices=self.terrain.vertices.copy(); vertices[:,:2]-=c.terrain.border_size

@@ -23,6 +23,9 @@ class CaReBN(nn.Module):
             statistics = "fixed"
         if statistics == "fixed":
             mean, var = self.mean, self.variance
+        elif statistics == "batch":
+            data = current.reshape(-1, current.shape[-1])
+            var, mean = torch.var_mean(data, dim=0, unbiased=False)
         else:
             data = current.reshape(-1, current.shape[-1])
             var, mean = torch.var_mean(data, dim=0, unbiased=False)

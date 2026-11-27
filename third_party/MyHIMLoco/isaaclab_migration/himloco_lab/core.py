@@ -68,7 +68,8 @@ class HIMCore(LegacyLogic):
         self.root_states[ids]=self.base_init_state
         self.root_states[ids,:3]+=self.env_origins[ids]
         if self.custom_origins:
-            self.root_states[ids,:2]+=torch_rand_float(-1.,1.,(len(ids),2),self.device)
+            jitter = getattr(self.cfg.terrain, "reset_xy_jitter", 1.)
+            self.root_states[ids,:2]+=torch_rand_float(-jitter,jitter,(len(ids),2),self.device)
         if self.backend.cfg.stage == 1:
             self.root_states[ids,7:13] = 0.
         elif not getattr(self.cfg.init_state, 'reset_at_nominal_pose', False):

@@ -1,0 +1,10 @@
+ARG BASE_IMAGE=nvcr.io/nvidia/isaac-lab:2.3.2
+FROM ${BASE_IMAGE}
+
+ENV ACCEPT_EULA=Y \
+    OMNI_KIT_ACCEPT_EULA=YES \
+    SHIM_PYTHON=/isaac-sim/python.sh
+
+RUN /isaac-sim/python.sh -m pip install --no-cache-dir tensorboard scipy==1.15.3 trimesh matplotlib
+
+WORKDIR /workspace/shim

@@ -1,0 +1,220 @@
+{
+  "date": "2026-11-26",
+  "sources": [
+    {
+      "id": "Pop",
+      "title": "Deep Reinforcement Learning with Population-Coded Spiking Neural Network for Continuous Control",
+      "identifier": "https://proceedings.mlr.press/v155/tang21a.html",
+      "version": "CoRL / PMLR 155",
+      "anchors": [
+        "§2; §3.1 Fig.3; Fig.5, supplement S1–S2"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "X94ZEF8B"
+    },
+    {
+      "id": "HIM",
+      "title": "Hybrid Internal Model: Learning Agile Legged Locomotion with Simulated Robot Response",
+      "identifier": "https://junfenglong.com/HIMLoco/",
+      "version": "ICLR 2024; 本地 PDF LCVIGHRE",
+      "anchors": [
+        "HIM architecture; successor state and velocity; Appendix B"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "8IEMJYIL"
+    },
+    {
+      "id": "Fully",
+      "title": "Fully Spiking Neural Network for Legged Robots",
+      "identifier": "https://arxiv.org/abs/2310.05022",
+      "version": "Zotero PDF MX575FYP / 作者代码",
+      "anchors": [
+        "§II; Figs.2–4; §III; RMA base/legged_robot.py step"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "KBW3HN6C"
+    },
+    {
+      "id": "CaRe",
+      "title": "CaRe-BN: Precise Moving Statistics for Stabilizing Spiking Neural Networks in Reinforcement Learning",
+      "identifier": "https://openreview.net/forum?id=AaZVrbElhC",
+      "version": "ICLR 2026; J2PBQYNA",
+      "anchors": [
+        "Ca-BN and Re-BN; continuous control; Figs.4–6"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "RLESX45Q"
+    },
+    {
+      "id": "ILC",
+      "title": "Fully Spiking Actor Network with Intra-layer Connections for Reinforcement Learning",
+      "identifier": "https://arxiv.org/html/2401.05444",
+      "version": "arXiv v1; SpikingJelly 作者示例",
+      "anchors": [
+        "§III-B–E; Eq.8,13; Algorithm 1; §IV-C/D Tables III–V"
+      ],
+      "read_level": "fulltext"
+    },
+    {
+      "id": "GRSN",
+      "title": "GRSN: Gated Recurrent Spiking Neurons for POMDPs and MARL",
+      "identifier": "https://doi.org/10.1609/aaai.v39i2.32139",
+      "version": "AAAI 2025; LU3YFJJW",
+      "anchors": [
+        "Fig.2; Algorithm 1; §5 Tables 1–2"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "6IVTCBWV"
+    },
+    {
+      "id": "ES",
+      "title": "ES-Parkour: Advanced Robot Parkour with Bio-inspired Event Camera and Spiking Neural Network",
+      "identifier": "https://arxiv.org/abs/2503.09985",
+      "version": "ICME 2025; UK6D8JQT",
+      "anchors": [
+        "§II–III Fig.3; warm-up and distillation"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "YAMRECRU"
+    },
+    {
+      "id": "Proxy",
+      "title": "Proxy Target: Bridging the Gap Between Discrete Spiking Neural Networks and Continuous Control",
+      "identifier": "https://arxiv.org/html/2505.24161v3",
+      "version": "arXiv v3; QF757IAF",
+      "anchors": [
+        "§4.1–4.3, Eq.8"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "R56N7SXB"
+    },
+    {
+      "id": "CPG",
+      "title": "CPG-RL: Learning Central Pattern Generators for Quadruped Locomotion",
+      "identifier": "https://arxiv.org/pdf/2211.00458",
+      "version": "RA-L preprint 2022",
+      "anchors": [
+        "§II-B and §III-A Eq.1–8; §IV; Tables II–III"
+      ],
+      "read_level": "fulltext"
+    },
+    {
+      "id": "EP",
+      "title": "Neuromorphic Reinforcement Learning for Quadruped Locomotion Control on Uneven Terrain",
+      "identifier": "https://arxiv.org/html/2605.09595v1",
+      "version": "arXiv v1",
+      "anchors": [
+        "§3.1–3.3; §5 limitations; App.A"
+      ],
+      "read_level": "fulltext"
+    },
+    {
+      "id": "Akl",
+      "title": "Toward robust and scalable deep spiking reinforcement learning",
+      "identifier": "https://doi.org/10.3389/fnbot.2022.1075647",
+      "version": "Frontiers; 文中读出方法段",
+      "anchors": [
+        "Fig.1 and membrane readout"
+      ],
+      "read_level": "fulltext"
+    },
+    {
+      "id": "Model",
+      "title": "Spiking Neural Networks for Continuous Control via End-to-End Model-Based Learning",
+      "identifier": "https://arxiv.org/html/2509.05356v3",
+      "version": "arXiv v3",
+      "anchors": [
+        "§2.1–2.5; App.D, recurrent ablation"
+      ],
+      "read_level": "fulltext"
+    },
+    {
+      "id": "Arm",
+      "title": "Fully Spiking Actor-Critic Neural Network for Robotic Manipulation",
+      "identifier": "zotero://open-pdf/library/items/UCD8D5P5",
+      "version": "本地 PDF UCD8D5P5",
+      "anchors": [
+        "Fig.1; curriculum-guided PPO and Table I"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "JWRGS8IQ"
+    },
+    {
+      "id": "UAV",
+      "title": "Spiking Neural Network Actor-Critic Proximal Policy Optimization Control for Autonomous UAV Navigation Through Constrained Openings in Civil Infrastructure and Buildings",
+      "identifier": "zotero://open-pdf/library/items/EDWILR2F",
+      "version": "本地 PDF EDWILR2F",
+      "anchors": [
+        "任务、行动分布与引言"
+      ],
+      "read_level": "fulltext",
+      "zotero_item": "PTJTRZ8P"
+    },
+    {
+      "id": "SAC",
+      "title": "Spiking Neural Networks for Continuous Control: Neuromorphic Reinforcement Learning in Conventional Computing",
+      "identifier": "https://arxiv.org/abs/2608.22729",
+      "version": "arXiv v1",
+      "anchors": [
+        "摘要，仅作范围筛选"
+      ],
+      "read_level": "abstract"
+    }
+  ],
+  "environment": {
+    "isaac_lab": "2.3.2",
+    "local_checkout": "/home/qyw/MyHIMLoco/IsaacGymEnvs/IsaacLab",
+    "checkout_commit": "9b8b1932456f3258305363c07b214d655cf46b19",
+    "isaac_sim": "5.1.0",
+    "torch": "2.7.0+cu128",
+    "conda": [
+      "himloco",
+      "wmp_lab"
+    ]
+  },
+  "repositories": {
+    "FullySNNforLeggedRobots": {
+      "commit": "a57791b4494452b8836c2a90df6ffe1a828d56f8",
+      "url": "https://github.com/thisisnotahuman/FullySNNforLeggedRobots.git",
+      "license": "MIT at root; individual files retain notices"
+    },
+    "spikingjelly": {
+      "commit": "185b86409c20b5acabfeffc156e4d3c65f6dcbb5",
+      "url": "https://github.com/fangwei123456/spikingjelly.git",
+      "license": "Apache-2.0"
+    },
+    "GRSN-SNN": {
+      "commit": "2ca2624a9533145fdc9e9080b39d2e7d8d8ce896",
+      "url": "https://github.com/StillWolf/GRSN-SNN.git",
+      "license": "MIT"
+    },
+    "pop-spiking-deep-rl": {
+      "commit": "5e5b9047899e9f5282d14c8b8212073aa12742ce",
+      "url": "https://github.com/combra-lab/pop-spiking-deep-rl.git",
+      "license": "MIT"
+    }
+  },
+  "search_log": [
+    {
+      "source": "Zotero MCP + local API helper",
+      "result": "ECONNREFUSED, 已启用 API 偏好；只读本机 zotero.sqlite 主库快照和 storage 中实际 PDF。未修改文库。",
+      "search": "本科毕设、脉冲强化学习四足机器人运动控制等分类；标题包含 spiking, spike, quadruped, hybrid internal, parkour, policy optimization；对实际 PDF 方法关键词补查。"
+    },
+    {
+      "source": "paper-search arXiv",
+      "query": "(ti:\"spiking\" AND (abs:\"quadruped\" OR ti:\"continuous control\"))",
+      "screen": "返回九条；保留腿足、连续动作、代理更新，未将机械臂/六足结果当作四足越障证据。"
+    },
+    {
+      "source": "Web + primary sources",
+      "query": [
+        "continuous control population coding PopSAN ILC-SAN",
+        "quadruped locomotion PPO spiking policy recurrent adaptive neurons",
+        "A1 CPG-RL locomotion residual policy",
+        "spiking actor continuous membrane readout TD3",
+        "spiking neural networks continuous control end-to-end model-based learning"
+      ],
+      "screen": "按研究方法与本地项目的差异筛选；同一论文预印本、Zotero 及官方实现合并。"
+    }
+  ]
+}

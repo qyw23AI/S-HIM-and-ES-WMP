@@ -70,7 +70,8 @@ def run(args):
                              estimator_layers=config.get("estimator_layers", 2), population=config.get("population", 5),
                              recurrent=config.get("estimator", "grsn") == "grsn",
                              grsn_threshold=config.get("grsn_threshold", 1.0),
-                             grsn_bias=config.get("grsn_bias")).to(env.device)
+                             grsn_bias=config.get("grsn_bias"),
+                             critic_widths=config.get("critic_widths", (256, 128))).to(env.device)
                 model.load_state_dict(saved["model"])
                 model = model.fused()
                 model.actor.static_projection = not args.legacy_actor_projection
