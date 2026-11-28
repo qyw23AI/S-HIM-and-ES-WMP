@@ -9,10 +9,10 @@ def body_observation(env, observation):
 def shim_observation_converter(core):
     """Build the WMP-to-HIM observation transform from the two A1 configs."""
     from himloco_lab.config import asset_contract as him_asset_contract
-    from himloco_lab.config import load_config
+    from graduation.legacy.base.s_him_base_config import SHIMBaseCfg
     from wmp_lab.config import asset_contract as wmp_asset_contract
 
-    him, _ = load_config("a1", core.num_envs, 4)
+    him = SHIMBaseCfg()
     _, him_joints, _, _ = him_asset_contract(him)
     _, wmp_joints, _, _ = wmp_asset_contract(core.cfg)
     if him_joints != wmp_joints:

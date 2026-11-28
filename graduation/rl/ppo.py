@@ -17,7 +17,8 @@ def returns(reward, value, next_value, done, gamma=0.99, lam=0.95):
 def ppo_update(mean, value, log_std, optimizer, batch, epochs=4, minibatches=4, microbatch=None, *,
                old_mu=None, old_sigma=None, desired_kl=None, lr_min=1e-5, lr_max=1e-2,
                max_grad_norm=1.0, separate_grad_clip=False, actor_params=None, critic_params=None,
-               std_params=None, return_metrics=False, entropy_coef=0.01, max_log_std=2.0):
+               std_params=None, return_metrics=False, entropy_coef=0.01, max_log_std=2.0,
+               clip_param=0.2, value_loss_coef=1.0, use_clipped_value_loss=True):
     obs, critic, action, old_logp, old_value, target, advantage = batch
     loss_total = torch.zeros((), device=obs.device)
     updates = 0
@@ -41,12 +42,15 @@ def ppo_update(mean, value, log_std, optimizer, batch, epochs=4, minibatches=4, 
             for indices in rows.split(microbatch or len(rows)):
                 distribution = Normal(mean(obs[indices], critic[indices]), log_std.clamp(-5, max_log_std).exp())
                 ratio = (distribution.log_prob(action[indices]).sum(-1) - old_logp[indices]).exp()
-                policy_loss = -torch.minimum(ratio * advantage[indices], ratio.clamp(0.8, 1.2) * advantage[indices]).mean()
+                clipped_ratio = ratio.clamp(1.0 - clip_param, 1.0 + clip_param)
+                policy_loss = -torch.minimum(ratio * advantage[indices], clipped_ratio * advantage[indices]).mean()
                 prediction = value(obs[indices], critic[indices]).reshape(-1)
-                clipped = old_value[indices] + (prediction - old_value[indices]).clamp(-0.2, 0.2)
-                critic_loss = torch.maximum((prediction - target[indices]).square(), (clipped - target[indices]).square()).mean()
+                value_error = (prediction - target[indices]).square()
+                if use_clipped_value_loss:
+                    clipped = old_value[indices] + (prediction - old_value[indices]).clamp(-clip_param, clip_param)
+                    value_error = torch.maximum(value_error, (clipped - target[indices]).square())
                 entropy_val = distribution.entropy().sum(-1)
-                loss = policy_loss + critic_loss - entropy_coef * entropy_val.mean()
+                loss = policy_loss + value_loss_coef * value_error.mean() - entropy_coef * entropy_val.mean()
                 weighted = loss * (len(indices) / len(rows))
                 weighted.backward()
                 loss_total += weighted.detach()
@@ -63,7 +67,7 @@ def ppo_update(mean, value, log_std, optimizer, batch, epochs=4, minibatches=4, 
                             ).sum(-1)
                             mb_kls.append(kl_b)
                         if return_metrics:
-                            mb_clips.append(((ratio - 1.0).abs() > 0.2).float())
+                            mb_clips.append(((ratio - 1.0).abs() > clip_param).float())
                             mb_ents.append(entropy_val)
                             preds_all.append(prediction.detach())
                             targets_all.append(target[indices].detach())

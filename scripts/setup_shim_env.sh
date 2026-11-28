@@ -211,7 +211,7 @@ fi
 
 if ((smoke)); then
     cd -- "$repo"
-    "$python" scripts/bench_blind.py himloco --headless --terrain stairs --amp --amp-motion-set a1_diagonal \
+    "$python" scripts/bench_blind.py --task himloco_a1_amp_rough_cmdcur --headless \
         --num-envs 8 --steps 12 --iterations 2 --kit_args="--/rtx/verifyDriverVersion/enabled=false" \
         --out runs/shim-setup-smoke
 fi

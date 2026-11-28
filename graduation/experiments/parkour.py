@@ -18,6 +18,7 @@ def run(args):
 
     from graduation.evaluation.energy import SynapticMeter
     from graduation.methods.es_parkour.student import ESStudent, es_spike_inputs
+    from graduation.methods.es_parkour.task import course_waypoints, heading_error
     from graduation.sensors.events import event_frame
     from graduation.rl.ppo import ppo_update, returns
 
@@ -26,7 +27,7 @@ def run(args):
     torch.manual_seed(args.seed)
     torch.set_num_threads(4)
     args.out.mkdir(parents=True, exist_ok=True)
-    env, adapter, _ = make_visual_env(args, reward_profile=args.reward_profile if args.mode != "wmp-events" else None)
+    env, adapter, _ = make_visual_env(args, reward_profile=args.reward_profile)
     try:
         observation, _ = adapter.reset()
         core = env.core
@@ -34,13 +35,14 @@ def run(args):
         proprio_dim = 44
         scan_dim = core.height_dim
         actions = core.num_actions
+        waypoints = course_waypoints(core)
 
         def observations():
             offset = core.privileged_dim
             local = core.obs_buf[:, offset:-scan_dim]
             # Retain body observation and velocity commands. Yaw is a separate teacher signal.
             proprio = torch.cat((local[:, :8], local[:, 9:]), dim=-1)
-            heading = core.heading_error()[:, None]
+            heading = heading_error(core, waypoints)[:, None]
             scan = core.obs_buf[:, -scan_dim:]
             return proprio, heading, torch.cat((scan, heading), dim=1)
 
@@ -86,12 +88,12 @@ def run(args):
                      if args.checkpoint else None)
             channels = saved["base_channels"] if saved else args.base_channels
             student_config = (saved.get("student_config", {}) if saved else {
-                "normalization": args.student_normalization or "batch", "threshold": args.student_threshold or 1.0,
-                "residual": args.student_residual or "if",
+                "normalization": args.student_normalization, "threshold": args.student_threshold,
+                "residual": args.student_residual,
             })
             student = ESStudent(proprio_dim, actions, base=channels, **student_config).to(env.device)
             probe_inputs = None
-            optimizer = torch.optim.Adam(student.parameters(), lr=0.001)
+            optimizer = torch.optim.Adam(student.parameters(), lr=args.lr)
             if saved:
                 student.load_state_dict(saved["student"])
                 if args.mode == "distill":
@@ -159,7 +161,7 @@ def run(args):
                 report["energy"] = meter.report(args.steps * args.num_envs, 1 / env.step_dt)
         report.update(mode=args.mode, status="passed", terrain=args.terrain, seed=args.seed,
                       num_envs=args.num_envs, steps=args.steps, policy_hz=1 / env.step_dt,
-                      event_hz=1 / (period * env.step_dt), reward_profile=args.reward_profile if args.mode != "wmp-events" else None)
+                      event_hz=1 / (period * env.step_dt), reward_profile=args.reward_profile)
         (args.out / "validation.json").write_text(json.dumps(report, indent=2) + "\n")
         print("VALIDATION", report, flush=True)
     finally:

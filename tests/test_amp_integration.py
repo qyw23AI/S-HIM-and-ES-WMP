@@ -16,6 +16,7 @@ from graduation.rl.amp import (
     AmpReplayBuffer,
     RunningMomentNormalizer,
     a1_foot_positions_base,
+    amp_obs_dim,
     attach_amp_terminal_hook,
     extract_him_amp_observations,
     resolve_amp_motion_files,
@@ -74,6 +75,14 @@ class AmpAndFeedbackTests(unittest.TestCase):
         core.dof_pos.zero_()
         self.assertTrue(torch.allclose(core._amp_terminal_obs, expected))
 
+        for mode, dim in (("wmp30", 30), ("joint24", 24), ("full43", 43)):
+            with self.subTest(mode=mode):
+                attach_amp_terminal_hook(env, obs_mode=mode)
+                self.assertEqual(core._amp_terminal_obs.shape, (0, dim))
+                expected = extract_him_amp_observations(core, obs_mode=mode)[ids]
+                self.assertTrue(torch.equal(core.compute_termination_observations(ids), term))
+                torch.testing.assert_close(core._amp_terminal_obs, expected, atol=0, rtol=0)
+
     def test_diagonal_motion_presets(self):
         forward = [WMP_A1_MOTIONS / name for name in ("trot1.txt", "trot2.txt")]
         self.assertEqual(resolve_amp_motion_files(), (forward, "fl_fr_rl_rr"))
@@ -100,6 +109,47 @@ class AmpAndFeedbackTests(unittest.TestCase):
                             self.assertLess(float(obs[:, 26].std()), 0.08)
                             correlation = torch.corrcoef(obs[:, [14, 23]].T)
                             self.assertGreater(float(correlation[0, 1]), 0.85)
+
+    def test_diagonal_omni_observation_layouts_match_policy_channels(self):
+        files, order = resolve_amp_motion_files("a1_diagonal_omni")
+        self.assertEqual(order, "auto")
+        self.assertEqual(files, [
+            WMP_A1_MOTIONS / "trot1.txt",
+            WMP_A1_MOTIONS / "trot2.txt",
+            AMP_FOR_HARDWARE / "datasets/mocap_motions/leftturn0.txt",
+            AMP_FOR_HARDWARE / "datasets/mocap_motions/rightturn0.txt",
+            AMP_A1_MOTIONS / "trot_reverse0.txt",
+        ])
+        # This permutation swaps the left and right legs in either direction.
+        swap_legs = [3, 4, 5, 0, 1, 2, 9, 10, 11, 6, 7, 8]
+        self.assertEqual(amp_obs_dim(), 30)
+        for mode, dim in (("wmp30", 30), ("joint24", 24), ("full43", 43)):
+            with self.subTest(mode=mode):
+                self.assertEqual(amp_obs_dim(mode), dim)
+                dataset = AmpMotionDataset(files, preload_transitions=32, leg_order=order, obs_mode=mode)
+                for batch in next(dataset.sample_minibatches(1, 8)):
+                    self.assertEqual(batch.shape, (8, dim))
+                    self.assertTrue(torch.isfinite(batch).all())
+
+                for path, expert in zip(files, dataset.trajectories, strict=True):
+                    with self.subTest(clip=path.name):
+                        frames = torch.tensor(json.loads(path.read_text())["Frames"], dtype=torch.float32)
+                        q, qd = frames[:, 7:19], frames[:, 37:49]
+                        foot_ref = frames[:, 19:31]
+                        if path.name in ("leftturn0.txt", "rightturn0.txt"):
+                            foot_ref = foot_ref[:, swap_legs]
+                        else:
+                            q, qd = q[:, swap_legs], qd[:, swap_legs]
+                        core = _DummyCore(q, qd, frames[:, 31:34], frames[:, 34:37], frames[:, 2])
+                        policy = extract_him_amp_observations(core, obs_mode=mode)
+                        self.assertEqual(expert.shape, (len(frames), dim))
+                        if mode == "full43":
+                            torch.testing.assert_close(expert[:, 12:24], foot_ref, atol=0, rtol=0)
+                            # Mocap foot positions differ slightly from runtime forward kinematics.
+                            torch.testing.assert_close(policy[:, 12:24], foot_ref, atol=0.016, rtol=0)
+                            channels = [*range(12), *range(24, 43)]
+                            expert, policy = expert[:, channels], policy[:, channels]
+                        torch.testing.assert_close(expert, policy, atol=0, rtol=0)
 
     def test_amp_dataset_replay_normalizer_and_discriminator_step(self):
         up_files, up_order = resolve_amp_motion_files("upstream_trot")

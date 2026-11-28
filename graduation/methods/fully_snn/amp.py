@@ -1,15 +1,12 @@
 """FullySNN AMP reset, expert observations, and Isaac Lab task settings."""
 
-from types import SimpleNamespace
-
+from graduation.legacy.es_wmp.fully_snn_config import FullySNNA1AmpCfg
 from graduation.paths import FULLY_SNN_AMP as AMP
 
 
 def make_amp_env(args):
     """Build the 30 ms A1 task with its author motion files."""
     import torch
-
-    from legacy import load_task_config
 
     from .motion_loader import AMPLoader
     from wmp_lab.core import Core
@@ -73,38 +70,9 @@ def make_amp_env(args):
             self.extras["time_outs"] = core.time_out_buf.clone()
             return {"policy": core.obs_buf, "critic": core.privileged_obs_buf}
 
-    legacy, _ = load_task_config("a1_amp")
+    legacy = FullySNNA1AmpCfg()
     legacy.core_factory = AMPCore
     legacy.env.num_envs = args.num_envs
-    legacy.env.num_observations = legacy.env.num_privileged_obs = 48
-    legacy.env.privileged_dim = 3
-    legacy.env.height_dim = 0
-    legacy.terrain.mesh_type = "plane"
-    legacy.terrain.curriculum = legacy.terrain.measure_heights = False
-    legacy.depth.camera_num_envs = 1
-    legacy.init_state.pos = [0., 0., .42]
-    legacy.init_state.default_joint_angles = {
-        f"{leg}_{joint}_joint": angle
-        for leg in ("FL", "FR", "RL", "RR")
-        for joint, angle in (("hip", 0.), ("thigh", .9), ("calf", -1.8))
-    }
-    legacy.control.stiffness, legacy.control.damping = {"joint": 80.}, {"joint": 1.}
-    legacy.control.action_scale, legacy.control.decimation = .25, 6
-    legacy.asset.self_collisions = 0
-    legacy.asset.terminate_after_contacts_on = ["base", "calf", "thigh"]
-    legacy.domain_rand.friction_range = [.25, 1.75]
-    legacy.domain_rand.added_mass_range = [-1., 1.]
-    legacy.domain_rand.push_interval_s = 15.
-    legacy.domain_rand.max_push_vel_xy = 1.
-    legacy.noise.noise_scales.dof_pos = .03
-    legacy.noise.noise_scales.dof_vel = 1.5
-    legacy.noise.noise_scales.ang_vel = .3
-    legacy.commands.heading_command = False
-    for name, span in {"lin_vel_x": [-1., 2.], "lin_vel_y": [-.3, .3], "ang_vel_yaw": [-1.57, 1.57]}.items():
-        setattr(legacy.commands.ranges, name, span)
-        setattr(legacy.commands.ranges, "flat_" + name, span)
-    legacy.rewards.reward_curriculum = False
-    legacy.rewards.scales = SimpleNamespace(tracking_lin_vel=1.5 / .03, tracking_ang_vel=.5 / .03)
     cfg = make_env_cfg(legacy, 4, args.device)
     cfg.seed = args.seed
     cfg.camera_backend = "raycast"

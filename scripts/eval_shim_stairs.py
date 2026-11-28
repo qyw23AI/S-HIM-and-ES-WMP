@@ -30,12 +30,14 @@ def run(args):
         cfg = torch.load(args.checkpoint, map_location=env.device, weights_only=True)
         width = adapter.num_one_step_obs
         if args.method == "himloco":
-            from himloco_lab.config import load_config
+            from graduation.legacy import class_to_dict
+            from graduation.legacy.base.s_him_base_config import SHIMBaseCfgPPO
+            from graduation.sim.himloco import himloco_policy_kwargs
             from rsl_rl.modules.him_actor_critic import HIMActorCritic
 
-            _, defaults = load_config("a1", args.num_envs, 4)
+            defaults = class_to_dict(SHIMBaseCfgPPO())
             baseline = HIMActorCritic(obs.shape[1], critic.shape[1], width, adapter.num_actions,
-                                     **defaults["policy"]).to(env.device).eval()
+                                     **himloco_policy_kwargs(defaults)).to(env.device).eval()
             baseline.load_state_dict(cfg["model_state_dict"])
             policy = baseline.act_inference
         else:

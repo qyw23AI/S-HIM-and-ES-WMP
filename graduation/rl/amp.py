@@ -23,6 +23,17 @@ AMP_MOTION_PRESETS = {
         ),
         "auto",
     ),
+    "a1_diagonal_omni": (
+        None,
+        (
+            WMP_A1_MOTIONS / "trot1.txt",
+            WMP_A1_MOTIONS / "trot2.txt",
+            UPSTREAM_AMP_DIR / "leftturn0.txt",
+            UPSTREAM_AMP_DIR / "rightturn0.txt",
+            AMP_A1_MOTIONS / "trot_reverse0.txt",
+        ),
+        "auto",
+    ),
     "upstream_trot": (UPSTREAM_AMP_DIR, ("trot0.txt", "trot1.txt", "leftturn0.txt"), "fr_fl_rr_rl"),
     "upstream": (
         UPSTREAM_AMP_DIR,
@@ -47,7 +58,16 @@ AMP_MOTION_PRESETS = {
 }
 # HIMLabEnv exposes joints in [FR, FL, RR, RL]; canonical AMP uses [FL, FR, RL, RR].
 LEGACY_TO_CANONICAL_JOINTS = (3, 4, 5, 0, 1, 2, 9, 10, 11, 6, 7, 8)
+AMP_OBS_DIMS = {"wmp30": 30, "joint24": 24, "full43": 43}
 AMP_OBS_DIM = 43
+
+
+def amp_obs_dim(obs_mode="wmp30"):
+    """Return the number of channels in an AMP observation."""
+    try:
+        return AMP_OBS_DIMS[obs_mode]
+    except KeyError:
+        raise ValueError(f"Unsupported AMP observation mode: {obs_mode}") from None
 
 
 def resolve_amp_motion_files(preset="a1_diagonal", motion_files=None):
@@ -97,11 +117,18 @@ def a1_foot_positions_base(joint_pos_canonical):
     return torch.cat(legs, dim=-1)
 
 
-def extract_him_amp_observations(core):
-    """Extract noise-free 43-dim A1 AMP observations ordered [FL, FR, RL, RR]."""
+def extract_him_amp_observations(core, obs_mode="full43"):
+    """Extract noise-free A1 AMP observations ordered [FL, FR, RL, RR]."""
     perm = torch.tensor(LEGACY_TO_CANONICAL_JOINTS, device=core.dof_pos.device, dtype=torch.long)
     joint_pos = core.dof_pos.index_select(1, perm)
     joint_vel = core.dof_vel.index_select(1, perm)
+    if obs_mode == "wmp30":
+        return torch.cat((joint_pos, core.base_lin_vel, core.base_ang_vel, joint_vel), dim=-1)
+    if obs_mode == "joint24":
+        return torch.cat((joint_pos, joint_vel), dim=-1)
+    if obs_mode != "full43":
+        raise ValueError(f"Unsupported AMP observation mode: {obs_mode}")
+
     foot_pos = a1_foot_positions_base(joint_pos)
     if hasattr(core, "_get_base_heights"):
         base_height = core._get_base_heights().unsqueeze(-1)
@@ -110,19 +137,23 @@ def extract_him_amp_observations(core):
     return torch.cat((joint_pos, foot_pos, core.base_lin_vel, core.base_ang_vel, joint_vel, base_height), dim=-1)
 
 
-def attach_amp_terminal_hook(env):
+def attach_amp_terminal_hook(env, obs_mode="full43"):
     """Record noise-free pre-reset AMP observations right before env resets."""
     core = env.core
+    obs_dim = amp_obs_dim(obs_mode)
+    if getattr(core, "_amp_terminal_obs_mode", None) == obs_mode:
+        return
+    core._amp_terminal_obs_mode = obs_mode
+    core._amp_terminal_obs = core.dof_pos.new_empty((0, obs_dim))
     if getattr(core, "_amp_terminal_hooked", False):
         return
     original = core.compute_termination_observations
 
     def wrapped(self, env_ids):
-        self._amp_terminal_obs = extract_him_amp_observations(self)[env_ids].clone()
+        self._amp_terminal_obs = extract_him_amp_observations(self, obs_mode=self._amp_terminal_obs_mode)[env_ids].clone()
         return original(env_ids)
 
     core.compute_termination_observations = MethodType(wrapped, core)
-    core._amp_terminal_obs = torch.empty(0, AMP_OBS_DIM, device=core.dof_pos.device, dtype=core.dof_pos.dtype)
     core._amp_terminal_hooked = True
 
 
@@ -144,11 +175,12 @@ def _reorder_fr_fl_to_canonical(frames):
 
 
 class AmpMotionDataset:
-    """Pure PyTorch/NumPy Unitree A1 mocap transition sampler matching 43-dim canonical AMP obs."""
+    """Sample Unitree A1 mocap transitions in the selected canonical AMP layout."""
 
     def __init__(self, motion_files, time_between_frames=0.02, preload_transitions=200000,
-                 device="cpu", seed=0, leg_order="auto"):
+                 device="cpu", seed=0, leg_order="auto", obs_mode="full43"):
         self.device = torch.device(device)
+        self.obs_dim = amp_obs_dim(obs_mode)
         self.time_between_frames = float(time_between_frames)
         self.trajectories = []
         self.frame_durations = []
@@ -169,7 +201,12 @@ class AmpMotionDataset:
                 frames = _reorder_fr_fl_to_canonical(frames)
             elif order != "fl_fr_rl_rr":
                 raise ValueError(f"Unsupported leg_order: {order}")
-            amp_obs = np.concatenate((frames[:, 7:49], frames[:, 2:3]), axis=1)
+            if obs_mode == "wmp30":
+                amp_obs = np.concatenate((frames[:, 7:19], frames[:, 31:49]), axis=1)
+            elif obs_mode == "joint24":
+                amp_obs = np.concatenate((frames[:, 7:19], frames[:, 37:49]), axis=1)
+            else:
+                amp_obs = np.concatenate((frames[:, 7:49], frames[:, 2:3]), axis=1)
             dt = float(payload["FrameDuration"])
             if dt <= 0:
                 raise ValueError(f"Nonpositive FrameDuration in {path}: {dt}")
@@ -187,8 +224,8 @@ class AmpMotionDataset:
     def _preload(self, count, seed):
         rng = np.random.default_rng(seed)
         traj_ids = rng.choice(len(self.trajectories), size=count, replace=True, p=self.weights)
-        states = torch.empty((count, AMP_OBS_DIM), device=self.device, dtype=torch.float32)
-        next_states = torch.empty((count, AMP_OBS_DIM), device=self.device, dtype=torch.float32)
+        states = torch.empty((count, self.obs_dim), device=self.device, dtype=torch.float32)
+        next_states = torch.empty_like(states)
         for tid in np.unique(traj_ids):
             mask_np = traj_ids == tid
             mask = torch.from_numpy(mask_np).to(self.device)

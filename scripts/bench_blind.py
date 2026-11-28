@@ -7,46 +7,57 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from graduation.experiments.blind import run
+from graduation.legacy import list_tasks
+from graduation.legacy.cli import configure_blind_cli
 from graduation.paths import HIM
 from graduation.sim.launch import launch
 
 
-def parse_args():
+def parse_args(argv=None):
     from isaaclab.app import AppLauncher
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("method", choices=("himloco", "ppo-mlp", "fully-snn", "s-him"))
+    parser.add_argument("--task", choices=[name for name in list_tasks() if name.startswith(("s_him_", "himloco_"))],
+                        help="Load a named environment and training profile")
     parser.add_argument("--rma-phase", choices=("joint", "policy", "adaptation"), default="joint")
     parser.add_argument("--success-distance-m", type=float, default=None,
                         help="Evaluation gate relative to the episode spawn along world +X")
-    parser.add_argument("--num-envs", type=int, default=8)
-    parser.add_argument("--iterations", type=int, default=2)
-    parser.add_argument("--steps", type=int, default=16, help="Rollout steps per update or evaluation length")
-    parser.add_argument("--seed", type=int, default=1)
-    parser.add_argument("--terrain", choices=("rough", "flat", "stairs", "stairs-high"), default="rough")
-    parser.add_argument("--reward-preset", choices=("default", "climb", "snn-amp", "snn-climb", "snn-stair"),
-                        default="default")
-    parser.add_argument("--normalization", choices=("care", "tdbn", "none"), default="care")
-    parser.add_argument("--swap-weight", type=float, default=1.0)
-    parser.add_argument("--history", type=int, choices=range(1, 7), default=5)
-    parser.add_argument("--estimator-width", type=int, default=64)
-    parser.add_argument("--estimator-layers", type=int, default=2)
-    parser.add_argument("--population", type=int, default=5)
-    parser.add_argument("--en-pop-dim", type=int, default=10, help="PopSAN Gaussian receptive field encoder width")
-    parser.add_argument("--en-mean-range", type=float, nargs=2, default=[-5.0, 5.0],
+    parser.add_argument("--num-envs", type=int)
+    parser.add_argument("--iterations", type=int)
+    parser.add_argument("--steps", type=int, help="Rollout steps per update or evaluation length")
+    parser.add_argument("--seed", type=int)
+    parser.add_argument("--terrain", choices=("rough", "flat"), help="Terrain layout (default: rough)")
+    parser.add_argument("--cmd-curriculum-init-x", type=float,
+                        help="Enable progressive velocity commands with this initial x half-range (m/s)")
+    parser.add_argument("--cmd-curriculum-init-y", type=float,
+                        help="Initial y half-range (m/s), defaults to min(init-x, 1.0), zero disables lateral commands")
+    parser.add_argument("--cmd-curriculum-max-x", type=float,
+                        help="Maximum x half-range (m/s), defaults to the A1 limit of 2.0")
+    parser.add_argument("--cmd-curriculum-step", type=float,
+                        help="Increase in velocity half-range per promotion (m/s)")
+    parser.add_argument("--cmd-curriculum-threshold", type=float,
+                        help="Tracking reward fraction that each sampled group must exceed for promotion")
+    parser.add_argument("--normalization", choices=("care", "tdbn", "none"))
+    parser.add_argument("--swap-weight", type=float)
+    parser.add_argument("--history", type=int, choices=range(1, 7))
+    parser.add_argument("--estimator-width", type=int)
+    parser.add_argument("--estimator-layers", type=int)
+    parser.add_argument("--population", type=int)
+    parser.add_argument("--en-pop-dim", type=int, help="PopSAN Gaussian receptive field encoder width")
+    parser.add_argument("--en-mean-range", type=float, nargs=2,
                         help="Initial [min, max] receptive field centers for PopEncoder")
-    parser.add_argument("--en-std", type=float, default=0.3872983346,
+    parser.add_argument("--en-std", type=float,
                         help="Initial Gaussian receptive field width for PopEncoder")
     parser.add_argument("--freeze-encoder", action="store_true",
                         help="Freeze PopEncoder mean and std parameters inside PopSANActor")
     parser.add_argument("--actor-intra-feedback", action="store_true",
                         help="Enable ILC-SAN per-joint output population intra-step feedback inside PopSANActor")
-    parser.add_argument("--actor-weight-decay", type=float, default=0.0,
+    parser.add_argument("--actor-weight-decay", type=float,
                         help="Optional decoupled weight decay on S-HIM actor parameters")
-    parser.add_argument("--ticks", type=int, default=4, help="SNN actor simulation ticks per control step")
-    parser.add_argument("--actor-widths", type=int, nargs="+", default=None,
+    parser.add_argument("--ticks", type=int, help="SNN actor simulation ticks per control step")
+    parser.add_argument("--actor-widths", type=int, nargs="+",
                         help="Hidden widths for S-HIM actor MLP/LIF backbone")
-    parser.add_argument("--estimator", choices=("grsn", "lif"), default="grsn")
+    parser.add_argument("--estimator", choices=("grsn", "lif"))
     grsn = parser.add_mutually_exclusive_group()
     grsn.add_argument("--grsn-threshold", type=float)
     grsn.add_argument("--grsn-bias", type=float, help="Initial GRSN normalization bias for a fresh run")
@@ -55,78 +66,95 @@ def parse_args():
     parser.add_argument("--imu-noise", type=float, default=0.0, help="Additional uniform noise in normalized gyro channels")
     parser.add_argument("--impulse", type=float, default=0.0, help="Lateral body-frame impulse in N s")
     parser.add_argument("--impulse-step", type=int, default=5)
-    parser.add_argument("--paper-training", action="store_true", help="Use the S-HIM thesis optimizer and critic settings")
-    parser.add_argument("--actor-output-bias-offset", type=float, default=0.,
+    parser.add_argument("--paper-training", action=argparse.BooleanOptionalAction, help="Use the S-HIM thesis optimizer and critic settings")
+    parser.add_argument("--actor-output-bias-offset", type=float,
                         help="Optional initialization offset for the final LIF current")
     parser.add_argument("--actor-output-norm", action="store_true",
                         help="Apply CaRe-BN to the output population layer before spiking")
-    parser.add_argument("--actor-norm", choices=("inherit", "care", "tdbn", "ln", "none"), default="inherit",
+    parser.add_argument("--actor-norm", choices=("inherit", "care", "tdbn", "ln", "none"),
                         help="Normalization layer inside LIFActor (defaults to --normalization)")
-    parser.add_argument("--actor-threshold", type=float, default=1.0, help="LIFActor firing threshold")
-    parser.add_argument("--actor-readout-mode", choices=("spike", "nlif", "linear"), default="spike",
+    parser.add_argument("--actor-threshold", type=float, help="LIFActor firing threshold")
+    parser.add_argument("--actor-readout-mode", choices=("spike", "nlif", "linear"),
                         help="Final layer mode: spiking LIF (spike), non-spiking LIF membrane (nlif), or rate-linear")
-    parser.add_argument("--actor-surrogate", choices=("atan", "rect"), default="atan",
+    parser.add_argument("--actor-surrogate", choices=("atan", "rect"),
                         help="Surrogate gradient shape inside LIFActor")
-    parser.add_argument("--actor-type", choices=("lif", "elu", "popsan"), default="lif",
+    parser.add_argument("--actor-type", choices=("lif", "elu", "popsan"),
                         help="Actor architecture (lif default, elu positive control, or FullySNN-style popsan)")
-    parser.add_argument("--freeze-aux-estimator-stats", action="store_true",
+    parser.add_argument("--freeze-aux-estimator-stats", action=argparse.BooleanOptionalAction,
                         help="Freeze CaRe-BN running buffers during auxiliary estimator updates")
-    parser.add_argument("--balanced-calibration", action="store_true",
+    parser.add_argument("--balanced-calibration", action=argparse.BooleanOptionalAction,
                         help="Use balanced random sampling across envs and ticks for calibration")
-    parser.add_argument("--learning-rate", type=float, default=3e-4, help="PPO optimizer learning rate")
-    parser.add_argument("--aux-learning-rate", type=float, default=1e-3, help="Auxiliary estimator learning rate")
-    parser.add_argument("--lr-schedule", choices=("fixed", "adaptive"), default="fixed",
+    parser.add_argument("--learning-rate", type=float, help="PPO optimizer learning rate")
+    parser.add_argument("--aux-learning-rate", type=float, help="Auxiliary estimator learning rate")
+    parser.add_argument("--lr-schedule", choices=("fixed", "adaptive"),
                         help="PPO optimizer LR schedule")
-    parser.add_argument("--desired-kl", type=float, default=0.01, help="Target KL for adaptive PPO LR schedule")
-    parser.add_argument("--max-lr", type=float, default=1e-2,
+    parser.add_argument("--desired-kl", type=float, help="Target KL for adaptive PPO LR schedule")
+    parser.add_argument("--max-lr", type=float,
                         help="Upper bound for adaptive PPO learning rate schedule")
-    parser.add_argument("--max-grad-norm", type=float, default=1.0, help="PPO gradient clip norm")
-    parser.add_argument("--separate-grad-clip", action="store_true",
+    parser.add_argument("--max-grad-norm", type=float, help="PPO gradient clip norm")
+    parser.add_argument("--separate-grad-clip", action=argparse.BooleanOptionalAction,
                         help="Clip actor, critic, and log_std gradient norms independently")
-    parser.add_argument("--log-std-lr-scale", type=float, default=1.0,
+    parser.add_argument("--log-std-lr-scale", type=float,
                         help="Relative LR multiplier for log_std parameter group")
-    parser.add_argument("--entropy-coef", type=float, default=0.01,
+    parser.add_argument("--entropy-coef", type=float,
                         help="Entropy regularization coefficient in PPO")
-    parser.add_argument("--max-action-std", type=float, default=None,
+    parser.add_argument("--max-action-std", type=float,
                         help="Optional upper bound on Gaussian action std")
-    parser.add_argument("--swap-temperature", type=float, default=0.1, help="SwAV softmax temperature")
-    parser.add_argument("--swap-reduction", choices=("sum", "mean"), default="sum",
+    parser.add_argument("--swap-temperature", type=float, help="SwAV softmax temperature")
+    parser.add_argument("--swap-reduction", choices=("sum", "mean"),
                         help="SwAV cross-entropy reduction across prototypes")
-    parser.add_argument("--target-mode", choices=("obs", "zero_cmd", "himloco", "priv_vel_cmd"), default="obs",
+    parser.add_argument("--target-mode", choices=("obs", "zero_cmd", "himloco", "priv_vel_cmd"),
                         help="Successor input layout for SwAV target network")
-    parser.add_argument("--amp", action="store_true",
+    parser.add_argument("--amp", action=argparse.BooleanOptionalAction,
                         help="Enable training-time Adversarial Motion Priors (AMP) style reward")
     parser.add_argument("--amp-motion-set",
-                        choices=("a1_diagonal", "a1_diagonal_turn", "upstream_trot", "upstream",
+                        choices=("a1_diagonal", "a1_diagonal_turn", "a1_diagonal_omni", "upstream_trot", "upstream",
                                  "a1_trot", "a1_trot_fwd", "a1_locomotion"),
-                        default="a1_diagonal",
                         help="Preset local third_party A1 mocap subset when --amp-motions is omitted")
+    parser.add_argument("--amp-obs-mode", choices=("wmp30", "joint24", "full43"), default="wmp30",
+                        help="Observation layout for policy and expert AMP transitions")
     parser.add_argument("--amp-motions", type=Path, nargs="+", default=None,
                         help="Explicit AMP mocap .txt files overriding --amp-motion-set")
-    parser.add_argument("--amp-reward-coef", type=float, default=2.0,
+    parser.add_argument("--amp-reward-coef", type=float,
                         help="AMP style reward scale per second (scaled by dt to match HIMLoco)")
-    parser.add_argument("--amp-task-lerp", type=float, default=0.0,
+    parser.add_argument("--amp-task-lerp", type=float,
                         help="0 gives additive task + style; in (0, 1] interpolates (1-lerp)*style + lerp*task")
-    parser.add_argument("--amp-discr-lr", type=float, default=1e-4, help="AMP discriminator Adam LR")
-    parser.add_argument("--amp-discr-updates", type=int, default=20, help="Discriminator steps per PPO iteration")
-    parser.add_argument("--amp-batch-size", type=int, default=1024, help="AMP discriminator minibatch size")
-    parser.add_argument("--amp-replay-size", type=int, default=1000000, help="AMP policy replay capacity")
-    parser.add_argument("--amp-preload", type=int, default=200000, help="Preloaded expert transitions")
-    parser.add_argument("--amp-discr-widths", type=int, nargs="+", default=[1024, 512],
+    parser.add_argument("--amp-discr-lr", type=float, help="AMP discriminator Adam LR")
+    parser.add_argument("--amp-discr-updates", type=int, help="Discriminator steps per PPO iteration")
+    parser.add_argument("--amp-batch-size", type=int, help="AMP discriminator minibatch size")
+    parser.add_argument("--amp-replay-size", type=int, help="AMP policy replay capacity")
+    parser.add_argument("--amp-preload", type=int, help="Preloaded expert transitions")
+    parser.add_argument("--amp-discr-widths", type=int, nargs="+",
                         help="AMP discriminator hidden widths")
     parser.add_argument("--warmstart-teacher", type=Path, help="Existing HIMLoco A1 checkpoint for action warm-start")
     parser.add_argument("--warmstart-iterations", type=int, default=0)
-    parser.add_argument("--ppo-rollout-features", action="store_true",
+    parser.add_argument("--ppo-rollout-features", action=argparse.BooleanOptionalAction,
                         help="Use the estimator features recorded when PPO rollout actions were sampled")
-    parser.add_argument("--checkpoint-interval", type=int, default=0)
-    parser.add_argument("--diagnostics-interval", type=int, default=1)
-    parser.add_argument("--calibration-interval", type=int, default=1)
+    parser.add_argument("--checkpoint-interval", type=int)
+    parser.add_argument("--diagnostics-interval", type=int)
+    parser.add_argument("--calibration-interval", type=int)
     parser.add_argument("--checkpoint", type=Path, help="Load weights for evaluation or resume optimization")
     parser.add_argument("--eval", action="store_true")
     parser.add_argument("--energy", action="store_true", help="Profile an evaluation rollout")
     parser.add_argument("--out", type=Path, required=True)
     AppLauncher.add_app_launcher_args(parser)
-    args = parser.parse_args()
+    parser.add_argument("method", nargs="?", choices=("himloco", "ppo-mlp", "fully-snn", "s-him"))
+    args, smoke, default_max_x = configure_blind_cli(parser, argv)
+    init_x = args.cmd_curriculum_init_x
+    init_y = args.cmd_curriculum_init_y
+    max_x = args.cmd_curriculum_max_x
+    if init_x is not None and not 0 < init_x < float("inf"):
+        parser.error("--cmd-curriculum-init-x must be positive and finite")
+    if init_y is not None and not 0 <= init_y < float("inf"):
+        parser.error("--cmd-curriculum-init-y must be non-negative and finite")
+    if max_x is not None and not 0 < max_x < float("inf"):
+        parser.error("--cmd-curriculum-max-x must be positive and finite")
+    if init_x is not None and init_x > (default_max_x if max_x is None else max_x):
+        parser.error(f"--cmd-curriculum-max-x (A1 default {default_max_x}) must be at least --cmd-curriculum-init-x")
+    if not 0 < args.cmd_curriculum_step < float("inf"):
+        parser.error("--cmd-curriculum-step must be positive and finite")
+    if not 0 < args.cmd_curriculum_threshold <= 1:
+        parser.error("--cmd-curriculum-threshold must be in (0, 1]")
     if not args.max_lr > 0:
         parser.error("--max-lr must be positive")
     if min(args.num_envs, args.steps, args.iterations, args.calibration_interval,
@@ -157,17 +185,17 @@ def parse_args():
         parser.error("--ppo-rollout-features requires --paper-training")
     if args.paper_training and (args.method != "s-him" or args.eval):
         parser.error("--paper-training requires S-HIM training")
+    shim_only = (
+        "actor_output_norm", "actor_type", "freeze_aux_estimator_stats", "balanced_calibration", "separate_grad_clip",
+        "log_std_lr_scale", "swap_temperature", "swap_reduction", "target_mode", "ticks", "en_pop_dim",
+        "actor_widths", "actor_norm", "actor_threshold", "actor_readout_mode", "actor_surrogate", "en_mean_range",
+        "en_std", "freeze_encoder", "actor_intra_feedback", "actor_weight_decay",
+    )
     if args.method != "s-him" and (
-            args.actor_output_norm or args.actor_type != "lif" or args.freeze_aux_estimator_stats
-            or args.balanced_calibration or (args.method != "himloco" and args.lr_schedule != "fixed")
-            or args.separate_grad_clip
-            or args.log_std_lr_scale != 1.0 or args.swap_temperature != 0.1
-            or args.swap_reduction != "sum" or args.target_mode != "obs"
-            or args.ticks != 4 or args.en_pop_dim != 10 or args.actor_widths is not None or args.actor_norm != "inherit"
-            or args.actor_threshold != 1.0 or args.actor_readout_mode != "spike"
-            or args.actor_surrogate != "atan" or args.en_mean_range != [-5.0, 5.0]
-            or abs(args.en_std - 0.3872983346) > 1e-9 or args.freeze_encoder
-            or args.actor_intra_feedback or args.actor_weight_decay != 0.0):
+        any(getattr(args, key) != smoke[key] for key in shim_only if key != "en_std")
+        or abs(args.en_std - smoke["en_std"]) > 1e-9
+        or (args.method != "himloco" and args.lr_schedule != smoke["lr_schedule"])
+    ):
         parser.error("S-HIM variant flags require method s-him")
     if (args.actor_intra_feedback or args.freeze_encoder) and args.actor_type != "popsan":
         parser.error("--actor-intra-feedback and --freeze-encoder require --actor-type popsan")

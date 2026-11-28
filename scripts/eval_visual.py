@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from graduation.experiments.visual_suite import run
+from graduation.legacy import load_config
 from graduation.paths import HIM, WMP
 from graduation.sim.launch import launch
 
@@ -16,17 +17,19 @@ def main():
     sys.path[:0] = [str(WMP), str(WMP / "isaaclab_migration")]
     from isaaclab.app import AppLauncher
 
+    cfg, train = load_config("es_wmp_a1_mixed")
+    runner = train["runner"]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("method", choices=("wmp", "es-parkour", "s-him", "event-spiking-wmp"))
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--purpose", choices=("smoke", "formal"), default="smoke")
-    parser.add_argument("--terrain", choices=("parkour", "mixed", "flat"), default="mixed")
-    parser.add_argument("--num-envs", type=int, default=8)
-    parser.add_argument("--steps", type=int, default=20)
-    parser.add_argument("--episode-seconds", type=float, default=20)
+    parser.add_argument("--terrain", choices=("parkour", "mixed", "flat"), default=cfg.terrain_name)
+    parser.add_argument("--num-envs", type=int, default=runner["num_envs"])
+    parser.add_argument("--steps", type=int, default=runner["rollout_steps"])
+    parser.add_argument("--episode-seconds", type=float, default=runner["episode_seconds"])
     parser.add_argument("--goal-distance", type=float, default=3.)
-    parser.add_argument("--threshold", type=float, default=.08)
+    parser.add_argument("--threshold", type=float, default=train["distillation"]["threshold"])
     parser.add_argument("--flow-mode", choices=("random", "analytical"), default="random")
     parser.add_argument("--mask-events-on-pause", action="store_true")
     parser.add_argument("--pause-trigger-distance", type=float, help="Approach distance to the first parkour obstacle")
@@ -39,7 +42,7 @@ def main():
     parser.add_argument("--pause-at", type=int, default=5, help="Trigger step or earliest distance-trigger step")
     parser.add_argument("--pause-steps", type=int, default=0, help="Consecutive control steps inside the stop speed band")
     parser.add_argument("--resume-distance", type=float, default=.25)
-    parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=train["seed"])
     parser.add_argument("--energy", action="store_true")
     AppLauncher.add_app_launcher_args(parser)
     args = parser.parse_args()

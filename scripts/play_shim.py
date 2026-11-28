@@ -68,7 +68,6 @@ def run(args):
     elif args.terrain == "stairs":
         env, adapter = make_stair_env(args)
     else:
-        args.reward_preset = "default"
         env, adapter, _ = make_blind_env(args)
 
     labels: dict[str, str] = {}

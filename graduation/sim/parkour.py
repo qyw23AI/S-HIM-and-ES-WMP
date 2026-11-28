@@ -4,7 +4,9 @@ import numpy as np
 from wmp_lab.heightfield import SubTerrain
 from wmp_lab.terrain import Terrain
 
-KINDS = ("gap", "stairup", "hurdle", "parkour")
+from graduation.legacy.es_wmp.es_wmp_config import ESWMPA1ParkourCfg
+
+KINDS = ESWMPA1ParkourCfg.terrain.column_types_override
 FIRST_OBSTACLE_X = (2.15, 2.10, 2.20, 2.00)
 SPAWN_X = .80
 

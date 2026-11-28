@@ -30,11 +30,13 @@ def load_policy(args, obs, critic, width, actions, device):
 
     cfg = torch.load(args.checkpoint, map_location=device, weights_only=True)
     if args.method == "himloco":
-        from himloco_lab.config import load_config
+        from graduation.legacy import class_to_dict
+        from graduation.legacy.base.s_him_base_config import SHIMBaseCfgPPO
+        from graduation.sim.himloco import himloco_policy_kwargs
         from rsl_rl.modules.him_actor_critic import HIMActorCritic
 
-        _, defaults = load_config("a1", args.num_envs, 4)
-        baseline = HIMActorCritic(obs.shape[1], critic.shape[1], width, actions, **defaults["policy"]).to(device).eval()
+        defaults = class_to_dict(SHIMBaseCfgPPO())
+        baseline = HIMActorCritic(obs.shape[1], critic.shape[1], width, actions, **himloco_policy_kwargs(defaults)).to(device).eval()
         baseline.load_state_dict(cfg["model_state_dict"])
         return baseline.act_inference, int(cfg.get("iteration", cfg.get("iter", -1)))
     from graduation.methods.s_him.policy import SHIM
@@ -50,7 +52,7 @@ def load_policy(args, obs, critic, width, actions, device):
 
 def make_flat_env(args):
     from himloco_lab.adapter import LegacyRunnerAdapter
-    from himloco_lab.config import load_config
+    from graduation.legacy.s_him.evaluation_config import SHIMA1FlatEvalCfg
     from himloco_lab.env import HIMLabEnv
     from himloco_lab.env_cfg import make_env_cfg
 
@@ -60,18 +62,8 @@ def make_flat_env(args):
             self.pre_reset_position = self.core.root_states[:, :3].clone()
             return terminated, timeout
 
-    legacy, _ = load_config("a1", args.num_envs, 4)
-    legacy.terrain.mesh_type = "plane"
-    legacy.terrain.curriculum = False
-    legacy.terrain.reset_xy_jitter = 0.0
-    legacy.commands.curriculum = False
-    legacy.commands.heading_command = True
-    legacy.commands.ranges.heading = [0.0, 0.0]
-    legacy.commands.ranges.lin_vel_y = [0.0, 0.0]
-    legacy.commands.resampling_time = legacy.env.episode_length_s + 1.0
-    legacy.domain_rand.push_robots = False
-    legacy.domain_rand.disturbance = False
-    legacy.init_state.reset_at_nominal_pose = True
+    legacy = SHIMA1FlatEvalCfg()
+    legacy.env.num_envs = args.num_envs
     cfg = make_env_cfg(legacy, 4, args.device)
     cfg.seed = args.seed
     env = FlatEnv(cfg)

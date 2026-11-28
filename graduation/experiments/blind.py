@@ -17,16 +17,17 @@ def run(args):
     from torch.distributions import Normal
 
     from graduation.evaluation.energy import SynapticMeter
+    from graduation.legacy.base.s_him_base_config import BlindBenchCfgPPO
     from graduation.methods.fully_snn.rma import build_rma
     from graduation.methods.ppo_mlp.policy import build_mlp
     from graduation.methods.s_him.policy import SHIM, shim_spike_inputs
     from graduation.rl.amp import (
-        AMP_OBS_DIM, AmpDiscriminator, AmpMotionDataset, AmpReplayBuffer,
-        RunningMomentNormalizer, attach_amp_terminal_hook, extract_him_amp_observations,
+        AmpDiscriminator, AmpMotionDataset, AmpReplayBuffer, RunningMomentNormalizer,
+        amp_obs_dim, attach_amp_terminal_hook, extract_him_amp_observations,
         resolve_amp_motion_files,
     )
     from graduation.rl.ppo import ppo_update, returns
-    from graduation.sim.himloco import make_blind_env
+    from graduation.sim.himloco import himloco_algorithm_kwargs, himloco_policy_kwargs, make_blind_env
 
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -40,50 +41,19 @@ def run(args):
                              "actor_output_spike", "actor_readout_mode", "actor_surrogate",
                              "en_mean_range", "en_std", "freeze_encoder", "actor_intra_feedback",
                              "swap_temperature", "swap_reduction", "target_mode")
-        args.critic_widths = (512, 256, 128) if args.paper_training else (256, 128)
-        raw_widths = getattr(args, "actor_widths", None)
-        args.actor_widths = (128, 64) if raw_widths is None else tuple(raw_widths)
-        args.ticks = getattr(args, "ticks", 4)
-        args.en_pop_dim = getattr(args, "en_pop_dim", 10)
-        args.en_mean_range = tuple(getattr(args, "en_mean_range", (-5.0, 5.0)))
-        args.en_std = float(getattr(args, "en_std", 0.3872983346))
-        args.freeze_encoder = getattr(args, "freeze_encoder", False)
-        args.actor_intra_feedback = getattr(args, "actor_intra_feedback", False)
-        args.actor_weight_decay = float(getattr(args, "actor_weight_decay", 0.0))
-        args.amp = getattr(args, "amp", False)
-        args.amp_motion_set = getattr(args, "amp_motion_set", "a1_diagonal")
-        args.amp_motions = getattr(args, "amp_motions", None)
-        args.amp_reward_coef = float(getattr(args, "amp_reward_coef", 2.0))
-        args.amp_task_lerp = float(getattr(args, "amp_task_lerp", 0.0))
-        args.amp_discr_lr = float(getattr(args, "amp_discr_lr", 1e-4))
-        args.amp_discr_updates = int(getattr(args, "amp_discr_updates", 20))
-        args.amp_batch_size = int(getattr(args, "amp_batch_size", 1024))
-        args.amp_replay_size = int(getattr(args, "amp_replay_size", 1000000))
-        args.amp_preload = int(getattr(args, "amp_preload", 200000))
-        args.amp_discr_widths = tuple(getattr(args, "amp_discr_widths", (1024, 512)))
-        args.actor_output_norm = getattr(args, "actor_output_norm", False)
-        args.actor_type = getattr(args, "actor_type", "lif")
-        raw_actor_norm = getattr(args, "actor_norm", None)
-        args.actor_norm = None if raw_actor_norm in (None, "inherit") else raw_actor_norm
-        args.actor_threshold = getattr(args, "actor_threshold", 1.0)
-        args.actor_readout_mode = getattr(args, "actor_readout_mode", "spike")
-        args.actor_surrogate = getattr(args, "actor_surrogate", "atan")
+        policy_cfg = defaults["policy"]
+        ppo_cfg = defaults["algorithm"]
+        epochs = ppo_cfg["num_learning_epochs"]
+        if not getattr(args, "task", None) and not args.paper_training:
+            epochs = BlindBenchCfgPPO.algorithm.num_learning_epochs
+        args.critic_widths = tuple(
+            policy_cfg["critic_hidden_dims"] if args.paper_training else policy_cfg["default_critic_widths"]
+        )
+        args.actor_widths = tuple(args.actor_widths or policy_cfg["default_actor_widths"])
+        args.en_mean_range = tuple(args.en_mean_range)
+        args.actor_norm = None if args.actor_norm == "inherit" else args.actor_norm
         args.actor_output_spike = getattr(args, "actor_output_spike", args.actor_readout_mode == "spike")
-        args.freeze_aux_estimator_stats = getattr(args, "freeze_aux_estimator_stats", False)
-        args.balanced_calibration = getattr(args, "balanced_calibration", False)
-        args.learning_rate = getattr(args, "learning_rate", 3e-4)
-        args.aux_learning_rate = getattr(args, "aux_learning_rate", 1e-3)
-        args.lr_schedule = getattr(args, "lr_schedule", "fixed")
-        args.desired_kl = getattr(args, "desired_kl", 0.01)
-        args.max_grad_norm = getattr(args, "max_grad_norm", 1.0)
-        args.separate_grad_clip = getattr(args, "separate_grad_clip", False)
-        args.log_std_lr_scale = getattr(args, "log_std_lr_scale", 1.0)
-        args.entropy_coef = float(getattr(args, "entropy_coef", 0.01))
-        args.max_action_std = getattr(args, "max_action_std", None)
         max_log_std = math.log(float(args.max_action_std)) if args.max_action_std else 2.0
-        args.swap_temperature = getattr(args, "swap_temperature", 0.1)
-        args.swap_reduction = getattr(args, "swap_reduction", "sum")
-        args.target_mode = getattr(args, "target_mode", "obs")
         checkpoint = torch.load(args.checkpoint, map_location=args.device, weights_only=True) if args.checkpoint else None
         if checkpoint and args.method == "s-him":
             for key, val in checkpoint.get("model_config", {}).items():
@@ -96,12 +66,12 @@ def run(args):
         if himloco:
             from rsl_rl.modules.him_actor_critic import HIMActorCritic
             model = HIMActorCritic(obs.shape[1], critic_obs.shape[1], width, actions,
-                                   **defaults["policy"]).to(args.device)
+                                   **himloco_policy_kwargs(defaults)).to(args.device)
             if not args.eval:
                 from rsl_rl.algorithms.him_ppo import HIMPPO
 
                 algorithm = dict(
-                    defaults["algorithm"], learning_rate=args.learning_rate, schedule=args.lr_schedule,
+                    himloco_algorithm_kwargs(defaults), learning_rate=args.learning_rate, schedule=args.lr_schedule,
                     desired_kl=args.desired_kl, entropy_coef=args.entropy_coef, max_grad_norm=args.max_grad_norm,
                 )
                 alg = HIMPPO(model, device=args.device, **algorithm)
@@ -124,6 +94,8 @@ def run(args):
                          en_std=args.en_std,
                          freeze_encoder=args.freeze_encoder,
                          actor_intra_feedback=args.actor_intra_feedback).to(args.device)
+            with torch.no_grad():
+                model.log_std.fill_(math.log(policy_cfg["init_noise_std"]))
             if hasattr(model.actor, "static_projection"):
                 model.actor.static_projection = not args.legacy_actor_projection
             if args.actor_output_bias_offset and hasattr(model.actor, "layers"):
@@ -162,22 +134,24 @@ def run(args):
         aux_optimizer = torch.optim.Adam(aux_params, lr=args.aux_learning_rate) if aux_params else None
 
         amp_enabled = bool(args.amp and not args.eval)
+        obs_mode = getattr(args, "amp_obs_mode", "wmp30")
         amp_dataset = amp_replay = amp_norm = amp_disc = amp_optimizer = None
         if amp_enabled:
+            obs_dim = amp_obs_dim(obs_mode)
             motion_paths, amp_leg_order = resolve_amp_motion_files(args.amp_motion_set, args.amp_motions)
             amp_dataset = AmpMotionDataset(
                 motion_paths, time_between_frames=env.step_dt,
                 preload_transitions=args.amp_preload, device=args.device, seed=args.seed,
-                leg_order=amp_leg_order,
+                leg_order=amp_leg_order, obs_mode=obs_mode,
             )
-            amp_replay = AmpReplayBuffer(AMP_OBS_DIM, args.amp_replay_size, args.device)
-            amp_norm = RunningMomentNormalizer(AMP_OBS_DIM).to(args.device)
+            amp_replay = AmpReplayBuffer(obs_dim, args.amp_replay_size, args.device)
+            amp_norm = RunningMomentNormalizer(obs_dim).to(args.device)
             amp_disc = AmpDiscriminator(
-                AMP_OBS_DIM, hidden_dims=args.amp_discr_widths,
+                obs_dim, hidden_dims=args.amp_discr_widths,
                 amp_reward_coef=args.amp_reward_coef, task_reward_lerp=args.amp_task_lerp, dt=env.step_dt,
             ).to(args.device)
             amp_optimizer = torch.optim.Adam(amp_disc.parameters(), lr=args.amp_discr_lr, weight_decay=1e-4)
-            attach_amp_terminal_hook(env)
+            attach_amp_terminal_hook(env, obs_mode=obs_mode)
 
         def mean(observation, privileged=None):
             if args.method == "himloco":
@@ -256,7 +230,7 @@ def run(args):
                 raise ValueError("Resume imitation with the same teacher and warm-start iteration cutoff")
             weights = torch.load(args.warmstart_teacher, map_location=args.device, weights_only=True)
             teacher = HIMActorCritic(obs.shape[1], critic_obs.shape[1], width, actions,
-                                     **defaults["policy"]).to(env.device).eval()
+                                     **himloco_policy_kwargs(defaults)).to(env.device).eval()
             teacher.load_state_dict(weights["model_state_dict"])
             teacher.requires_grad_(False)
             warm_optimizer = torch.optim.Adam(model.actor.parameters(), lr=1e-3)
@@ -366,7 +340,7 @@ def run(args):
                 return base_stats
 
         episode_start_x = env.core.root_states[:, 0].clone()
-        amp_obs = extract_him_amp_observations(env.core) if amp_enabled else None
+        amp_obs = extract_him_amp_observations(env.core, obs_mode=obs_mode) if amp_enabled else None
         him_training = alg is not None
         log_training_details = args.paper_training or him_training
         log_aligned_speeds = args.ppo_rollout_features or him_training
@@ -440,7 +414,7 @@ def run(args):
                                 reward_term_totals[k] = reward_term_totals.get(k, 0.0) + float((v[keep] - prev_sums[k][keep]).sum())
                     if amp_enabled:
                         task_rewards.append(reward.clone())
-                        next_amp = extract_him_amp_observations(env.core)
+                        next_amp = extract_him_amp_observations(env.core, obs_mode=obs_mode)
                         after_amp = next_amp.clone()
                         if len(ids):
                             after_amp[ids] = env.core._amp_terminal_obs
@@ -498,6 +472,11 @@ def run(args):
                           "resets": int(done.sum()), "tracking_rmse_mps": float(torch.stack(tracking_errors).mean().sqrt()),
                           "mean_forward_displacement_m": float(torch.stack(forward_offsets).sum(0).mean()),
                           "impulses_per_env": applied}
+            if hasattr(env.core, "command_ranges"):
+                rx = env.core.command_ranges["lin_vel_x"]
+                ry = env.core.command_ranges["lin_vel_y"]
+                statistics["command_range_x"] = [float(rx[0]), float(rx[1])]
+                statistics["command_range_y"] = [float(ry[0]), float(ry[1])]
             if reward_term_steps > 0:
                 denom = reward_term_steps * env.step_dt
                 statistics["reward_per_second"] = {k: v / denom for k, v in reward_term_totals.items()}
@@ -517,7 +496,7 @@ def run(args):
                 with torch.no_grad():
                     alg.compute_returns(critic_obs)
                 value_loss, surrogate_loss, estimation_loss, swap_loss = alg.update()
-                max_lr = getattr(args, "max_lr", 1e-2)
+                max_lr = args.max_lr
                 if alg.learning_rate > max_lr:
                     alg.learning_rate = max_lr
                     for group in optimizer.param_groups:
@@ -589,7 +568,7 @@ def run(args):
                         torch.nn.utils.clip_grad_norm_(model.actor.parameters(), 1., error_if_nonfinite=True)
                         warm_optimizer.step()
                         total += loss.detach() * len(batch)
-                    targets, _ = returns(reward, old_value, next_value, done)
+                    targets, _ = returns(reward, old_value, next_value, done, ppo_cfg["gamma"], ppo_cfg["lam"])
                     critic_inputs, targets = flatten(privileged), flatten(targets)
                     critic_total = torch.zeros((), device=env.device)
                     for batch in selected[:8192].split(2048):
@@ -603,7 +582,7 @@ def run(args):
                                       imitation_mse=float(total / len(selected)),
                                       warmstart_value_mse=float(critic_total / min(len(selected), 8192)))
                 elif args.rma_phase != "adaptation":
-                    target, advantage = returns(reward, old_value, next_value, done)
+                    target, advantage = returns(reward, old_value, next_value, done, ppo_cfg["gamma"], ppo_cfg["lam"])
                     policy_obs = flatten(histories)
                     policy_mean = mean
                     if args.paper_training:
@@ -623,10 +602,13 @@ def run(args):
                     ppo_loss, ppo_metrics = ppo_update(
                         policy_mean, value, model.log_std, optimizer,
                         (policy_obs, *map(flatten, (privileged, sampled, old_logp, old_value, target, advantage))),
-                        epochs=5 if args.paper_training else 4, microbatch=4096 if args.paper_training else None,
+                        epochs=epochs, minibatches=ppo_cfg["num_mini_batches"],
+                        microbatch=4096 if args.paper_training else None,
+                        clip_param=ppo_cfg["clip_param"], value_loss_coef=ppo_cfg["value_loss_coef"],
+                        use_clipped_value_loss=ppo_cfg["use_clipped_value_loss"],
                         old_mu=flatten(old_mu), old_sigma=flatten(old_sigma),
                         desired_kl=args.desired_kl if args.lr_schedule == "adaptive" else None,
-                        lr_max=getattr(args, "max_lr", 1e-2),
+                        lr_max=args.max_lr,
                         max_grad_norm=args.max_grad_norm,
                         separate_grad_clip=args.separate_grad_clip,
                         actor_params=list(model.actor.parameters()) if shim else None,

@@ -14,11 +14,12 @@ LANE_HALF_WIDTH_M = .90
 def make_stair_env(args):
     """Create a fixed staircase and capture positions before simulator auto-reset."""
     from himloco_lab.adapter import LegacyRunnerAdapter
-    from himloco_lab.config import load_config
     from himloco_lab.env import HIMLabEnv
     from himloco_lab.env_cfg import make_env_cfg
     from himloco_lab.terrain.rough import Terrain
     from himloco_lab.terrain.heightfield import SubTerrain
+
+    from graduation.legacy.s_him.evaluation_config import SHIMA1StairEvalCfg
 
     class StairTerrain(Terrain):
         def make_terrain(self, choice, difficulty):
@@ -43,22 +44,10 @@ def make_stair_env(args):
             self.pre_reset_position = self.core.root_states[:, :3].clone()
             return terminated, timeout
 
-    legacy, _ = load_config("a1", args.num_envs, 4)
-    terrain = legacy.terrain
-    terrain.num_rows, terrain.num_cols = 1, min(args.num_envs, 8)
-    terrain.max_init_terrain_level = 0
-    terrain.terrain_length, terrain.terrain_width = 7.5, 2.4
-    terrain.horizontal_scale, terrain.vertical_scale = .03, .005
-    terrain.reset_xy_jitter = .10
-    terrain.terrain_factory = StairTerrain
-    legacy.commands.curriculum = False
-    legacy.commands.heading_command = True
-    legacy.commands.ranges.heading = [0., 0.]
-    legacy.commands.ranges.lin_vel_y = [0., 0.]
-    legacy.commands.resampling_time = legacy.env.episode_length_s + 1.
-    legacy.domain_rand.push_robots = False
-    legacy.domain_rand.disturbance = False
-    legacy.init_state.reset_at_nominal_pose = True
+    legacy = SHIMA1StairEvalCfg()
+    legacy.env.num_envs = args.num_envs
+    legacy.terrain.num_cols = min(args.num_envs, 8)
+    legacy.terrain.terrain_factory = StairTerrain
     cfg = make_env_cfg(legacy, 4, args.device)
     cfg.seed = args.seed
     env = StairEnv(cfg)

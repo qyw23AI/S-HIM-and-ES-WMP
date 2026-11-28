@@ -1,43 +1,45 @@
 """Shared Isaac Lab environment factory for the visual experiments."""
 
 
+from importlib import import_module
+
+from graduation.legacy import load_config
+
+
+def _resolve_factory(cfg, name):
+    path = getattr(cfg, name, None)
+    if isinstance(path, str):
+        module, attribute = path.split(":")
+        setattr(cfg, name, getattr(import_module(module), attribute))
+
+
 def make_visual_env(args, *, reward_profile=None, capture_outcomes=False):
-    """Build the WMP course or enable the ES-Parkour reward profile."""
-    from legacy import load_task_config
-    from wmp_lab.env import WMPEnv, Adapter
+    """Build the WMP scene and bind the selected terrain and reward implementations."""
+    from wmp_lab.env import Adapter, WMPEnv
     from wmp_lab.env_cfg import make_env_cfg
 
-    legacy, config = load_task_config("a1_amp")
-    legacy.env.num_envs = legacy.depth.camera_num_envs = args.num_envs
-    legacy.env.episode_length_s = args.episode_seconds
-    legacy.terrain.border_size = 5.0
-    if args.terrain == "parkour":
-        from graduation.sim.parkour import KINDS, ParkourTerrain
+    task = getattr(args, "task", None)
+    terrain = getattr(args, "terrain", None)
+    reward_profile = reward_profile or getattr(args, "reward_profile", None)
+    legacy, config = load_config(task or f"es_wmp_a1_{terrain or 'mixed'}")
+    if terrain is not None and terrain != legacy.terrain_name:
+        layout, _ = load_config(f"es_wmp_a1_{terrain}")
+        legacy.terrain, legacy.commands = layout.terrain, layout.commands
+        legacy.terrain_name = layout.terrain_name
 
-        legacy.terrain.num_rows = 6
-        legacy.terrain.num_cols = len(KINDS)
-        legacy.terrain.terrain_factory = ParkourTerrain
-        legacy.terrain.column_types_override = KINDS
-        legacy.terrain.max_init_terrain_level = 0
-        legacy.terrain.spawn_jitter_m = .15
-        legacy.terrain.terrain_proportions = [0.] * 10 + [0.25] * 4
-        legacy.commands.ranges.lin_vel_x = [0.6, 1.0]
-        legacy.commands.ranges.lin_vel_y = [0., 0.]
-        legacy.commands.ranges.heading = [0., 0.]
-        legacy.commands.ranges.ang_vel_yaw = [0., 0.]
-    else:
-        legacy.terrain.num_rows = 10
-        legacy.terrain.num_cols = 20
-    if args.terrain == "flat":
-        legacy.terrain.mesh_type = "plane"
-        legacy.terrain.curriculum = False
-    if reward_profile is not None:
-        from graduation.methods.es_parkour.task import configure_rewards
+    if reward_profile is not None and reward_profile != legacy.reward_profile:
+        rewards, _ = load_config(f"es_wmp_a1_parkour_{reward_profile}")
+        legacy.rewards, legacy.core_factory = rewards.rewards, rewards.core_factory
+        legacy.reward_profile = rewards.reward_profile
 
-        configure_rewards(legacy, reward_profile)
+    runner = config["runner"]
+    legacy.env.num_envs = legacy.depth.camera_num_envs = getattr(args, "num_envs", runner["num_envs"])
+    legacy.env.episode_length_s = getattr(args, "episode_seconds", runner["episode_seconds"])
+    _resolve_factory(legacy.terrain, "terrain_factory")
+    _resolve_factory(legacy, "core_factory")
     cfg = make_env_cfg(legacy, 4, args.device)
-    cfg.is_finite_horizon = reward_profile is not None
-    cfg.seed = args.seed
+    cfg.is_finite_horizon = hasattr(legacy, "core_factory")
+    cfg.seed = getattr(args, "seed", config["seed"])
     cfg.camera_backend = "raycast"
     if capture_outcomes:
         import torch

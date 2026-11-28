@@ -19,12 +19,11 @@ esac
 
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 case ${preset#smoke-} in
-    B1) name=B1_himloco_amp_diag_4096; method=himloco ;;
-    L1) name=L1_shim_nlif_diag_4096; method=s-him; readout=nlif ;;
-    L2) name=L2_shim_spike_diag_4096; method=s-him; readout=spike ;;
+    B1) name=B1_himloco_amp_rough_cmdcur_4096; method=himloco; task=himloco_a1_amp_rough_cmdcur ;;
+    L1) name=L1_shim_nlif_rough_cmdcur_4096; method=s-him; task=s_him_a1_rough_cmdcur ;;
+    L2) name=L2_shim_spike_rough_cmdcur_4096; method=s-him; task=s_him_a1_spike_rough_cmdcur ;;
 esac
 
-task=s_him_a1_stair
 total=
 smoke_args=()
 if [[ $preset == smoke-* ]]; then
@@ -231,9 +230,6 @@ cmd=("$python" scripts/bench_blind.py "$method" --task "$task"
      --iterations "$remaining" --headless --out "$out" "${smoke_args[@]}")
 if [[ -n $seed ]]; then
     cmd+=(--seed "$seed")
-fi
-if [[ $method == s-him ]]; then
-    cmd+=(--actor-readout-mode "$readout")
 fi
 if [[ ${DISABLE_KIT_DRIVER_BYPASS:-0} != 1 ]]; then
     cmd+=(--kit_args=--/rtx/verifyDriverVersion/enabled=false)

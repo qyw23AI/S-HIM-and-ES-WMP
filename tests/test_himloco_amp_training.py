@@ -10,6 +10,7 @@ from unittest.mock import Mock, patch
 import torch
 
 from graduation.experiments.blind import run
+from graduation.legacy import load_config
 from graduation.paths import HIM
 from scripts.bench_blind import parse_args
 from scripts.eval_shim_panel import load_policy
@@ -79,11 +80,13 @@ class FakeCurriculumEnv(FakeHIMEnv):
 
 
 class HIMLocoAMPTrainingTest(unittest.TestCase):
+    task = "himloco_a1_amp_rough_cmdcur"
+
     def parse(self, out, extra=()):
         argv = [
-            "bench_blind.py", "himloco", "--amp", "--lr-schedule", "adaptive",
+            "bench_blind.py", "--task", self.task, "--lr-schedule", "adaptive",
             "--desired-kl", "0.01", "--max-lr", "1e-3", "--out", str(out),
-            "--terrain", "stairs", "--reward-preset", "snn-stair", "--amp-motion-set", "a1_trot",
+            "--amp-motion-set", "a1_trot",
             "--num-envs", "2", "--steps", "3", "--learning-rate", "1.1e-3", "--max-action-std", "0.5",
             "--checkpoint-interval", "1", "--amp-discr-updates", "1", "--amp-batch-size", "4",
             "--amp-replay-size", "16", "--amp-preload", "16", "--amp-discr-widths", "8", *extra,
@@ -103,30 +106,28 @@ class HIMLocoAMPTrainingTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, patch.object(
             sys, "path", [str(HIM / "isaaclab_migration"), str(HIM / "rsl_rl"), *sys.path]
         ):
-            from himloco_lab.config import load_config
-
             root = Path(tmp)
             env = None
 
             def make_env(args):
                 nonlocal env
                 env = FakeCurriculumEnv(args.num_envs)
-                _, defaults = load_config("a1", args.num_envs, 4)
+                _, defaults = load_config(args.task, args.num_envs)
                 defaults["algorithm"].update(num_learning_epochs=1, num_mini_batches=1)
                 return env, env, defaults
 
             with patch("graduation.sim.himloco.make_blind_env", side_effect=make_env):
-                run(self.parse(root / "stairs", ("--iterations", "1")))
-                stairs = torch.load(root / "stairs" / "model.pt", weights_only=True)
-                torch.testing.assert_close(stairs["terrain_levels"], env.core.terrain_levels)
+                run(self.parse(root / "rough", ("--iterations", "1")))
+                rough = torch.load(root / "rough" / "model.pt", weights_only=True)
+                torch.testing.assert_close(rough["terrain_levels"], env.core.terrain_levels)
                 run(self.parse(root / "flat", ("--iterations", "1", "--terrain", "flat")))
                 flat = torch.load(root / "flat" / "model.pt", weights_only=True)
                 self.assertNotIn("terrain_levels", flat)
 
                 # A deliberately out-of-range pair exercises clamping and tiling.
-                stairs["terrain_levels"] = torch.tensor([-2, 10], dtype=torch.int64)
-                checkpoint = root / "stairs.pt"
-                torch.save(stairs, checkpoint)
+                rough["terrain_levels"] = torch.tensor([-2, 10], dtype=torch.int64)
+                checkpoint = root / "rough.pt"
+                torch.save(rough, checkpoint)
                 for num_envs, expected in ((2, [0, 5]), (5, [0, 5, 0, 5, 0])):
                     with self.subTest(num_envs=num_envs):
                         out = root / f"resumed_{num_envs}"
@@ -152,9 +153,7 @@ class HIMLocoAMPTrainingTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, patch.object(
             sys, "path", [str(HIM / "isaaclab_migration"), str(HIM / "rsl_rl"), *sys.path]
         ):
-            from himloco_lab.config import load_config
-
-            _, defaults = load_config("a1", 2, 4)
+            _, defaults = load_config(self.task, 2)
             defaults["algorithm"].update(num_learning_epochs=1, num_mini_batches=1)
             out = Path(tmp) / "train"
             resume = Path(tmp) / "resume"
