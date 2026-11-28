@@ -135,6 +135,7 @@ torchvision==0.22.0+$cuda_index
 torchaudio==2.7.0+$cuda_index
 numpy==1.26.0
 scipy==1.15.3
+setuptools<81
 PINS
 
 lab_options=(-c "$constraints")
@@ -148,7 +149,7 @@ else
         --index-url "https://download.pytorch.org/whl/$cuda_index" \
         torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
     "${uv[@]}" -c "$constraints" --extra-index-url https://pypi.nvidia.com 'isaacsim[all,extscache]==5.1.0'
-    "${uv[@]}" -c "$constraints" 'setuptools>=68' wheel toml \
+    "${uv[@]}" -c "$constraints" 'setuptools>=68,<81' wheel toml \
         numpy==1.26.0 scipy==1.15.3 tensorboard trimesh matplotlib
 fi
 # Rebind editables to the current machine paths even after restoring an archive.
