@@ -239,6 +239,6 @@ class CommandCurriculumTest(unittest.TestCase):
         self.assert_ranges(legacy_env.core, 1.0, 1.0)
         self.assert_ranges(progressive_env.core, 0.2, 0.2)
         self.assert_ranges(named_env.core, 0.2, 0.2)
-        self.assertEqual(named_env.cfg.legacy.rewards.scales.tracking_lin_vel, 2.5)
+        self.assertEqual(named_env.cfg.legacy.rewards.scales.tracking_lin_vel, 3.0)
         self.assert_ranges(named_flat_env.core, 0.2, 0.0)
-        self.assertEqual(named_flat_env.cfg.legacy.rewards.scales.tracking_lin_vel, 2.5)
+        self.assertEqual(named_flat_env.cfg.legacy.rewards.scales.tracking_lin_vel, 3.0)

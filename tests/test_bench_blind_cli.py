@@ -30,14 +30,15 @@ class BenchBlindCLITest(unittest.TestCase):
                                  ("rough", 4096, 100, 5000, 1))
                 self.assertEqual((args.cmd_curriculum_init_x, args.cmd_curriculum_init_y, args.cmd_curriculum_max_x),
                                  (0.2, 0.2, 2.0))
+                self.assertEqual(args.cmd_curriculum_threshold, 0.70)
                 self.assertEqual((args.learning_rate, args.max_lr, args.desired_kl, args.lr_schedule),
                                  (8e-4, 8e-4, 0.045, "adaptive"))
-                self.assertEqual((args.max_grad_norm, args.entropy_coef, args.max_action_std), (5.0, 0.002, 0.55))
+                self.assertEqual((args.max_grad_norm, args.entropy_coef, args.max_action_std), (5.0, 0.003, 0.55))
                 self.assertEqual((args.diagnostics_interval, args.checkpoint_interval), (10, 250))
                 self.assertTrue(args.amp)
                 self.assertEqual((args.amp_motion_set, args.amp_obs_mode, args.amp_reward_coef, args.amp_task_lerp,
                                   args.amp_discr_lr, args.amp_discr_updates),
-                                 ("a1_diagonal_omni", "wmp30", 1.2, 0.0, 5e-5, 2))
+                                 ("a1_diagonal", "joint24", 0.6, 0.0, 5e-5, 2))
                 if method == "s-him":
                     self.assertEqual((args.actor_norm, args.actor_surrogate, args.actor_threshold,
                                       args.ticks, args.actor_widths), ("none", "rect", 0.5, 8, [256, 128]))
@@ -50,12 +51,12 @@ class BenchBlindCLITest(unittest.TestCase):
 
                 override = self.parse("--task", task, "--terrain=flat", "--num-envs", "8",
                                       "--cmd-curriculum-init-y", "0", "--amp-reward-coef", "2",
-                                      "--amp-obs-mode", "joint24", "--max-lr", "6e-4", "--no-amp")
+                                      "--amp-obs-mode", "full43", "--max-lr", "6e-4", "--no-amp")
                 self.assertEqual((override.terrain, override.num_envs), ("flat", 8))
                 self.assertEqual((override.cmd_curriculum_init_y, override.amp_reward_coef, override.max_lr),
                                  (0.0, 2.0, 6e-4))
                 self.assertFalse(override.amp)
-                self.assertEqual(override.amp_obs_mode, "joint24")
+                self.assertEqual(override.amp_obs_mode, "full43")
 
     def test_diagonal_amp_motion_presets(self):
         defaults = self.parse_max_lr("6e-4")

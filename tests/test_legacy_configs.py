@@ -118,28 +118,32 @@ for task in list_tasks():
         self.assertEqual((cfg.commands.curriculum_init_x, cfg.commands.curriculum_init_y), (0.2, 0.2))
         self.assertEqual(cfg.commands.ranges.lin_vel_x, [-2.0, 2.0])
         self.assertEqual(cfg.commands.ranges.lin_vel_y, [-1.0, 1.0])
-        self.assertEqual((cfg.commands.curriculum_step, cfg.commands.curriculum_threshold), (0.2, 0.8))
+        self.assertEqual((cfg.commands.curriculum_step, cfg.commands.curriculum_threshold), (0.2, 0.70))
         self.assertEqual(cfg.rewards.base_height_target, 0.30)
         self.assertEqual(class_to_dict(cfg.rewards.scales), dict(
             class_to_dict(SHIMBaseCfg().rewards.scales),
-            tracking_lin_vel=2.5, tracking_ang_vel=1.0, lin_vel_z=-2.0, ang_vel_xy=-0.05,
-            orientation=-0.2, dof_acc=-5e-8, joint_power=-5e-6, base_height=-1.0,
-            foot_clearance=0.0, action_rate=0.0, smoothness=-0.01, stumble=-0.1, collision=-0.25, stand_still=-0.5,
+            tracking_lin_vel=3.0, tracking_ang_vel=1.2, lin_vel_z=-0.5, ang_vel_xy=-0.03,
+            orientation=-0.1, dof_acc=-5e-8, joint_power=-5e-6, base_height=-0.5,
+            foot_clearance=0.0, action_rate=0.0, smoothness=0.0, stumble=-0.1, collision=-0.25, stand_still=-0.5,
         ))
         self.assertEqual(class_to_dict(cfg), class_to_dict(spike))
         self.assertEqual(class_to_dict(cfg), class_to_dict(ann))
         self.assertEqual(spike_train, dict(train, policy=dict(train["policy"], actor_readout_mode="spike")))
         base_train = class_to_dict(SHIMBaseCfgPPO())
         self.assertEqual(train["amp"], dict(
-            base_train["amp"], enabled=True, motion_set="a1_diagonal_omni", obs_mode="wmp30",
-            reward_coef=1.2, task_lerp=0.0, discr_lr=5e-5, discr_updates=2,
+            base_train["amp"], enabled=True, motion_set="a1_diagonal", obs_mode="joint24",
+            reward_coef=0.6, task_lerp=0.0, discr_lr=5e-5, discr_updates=2,
         ))
+        shared_algorithm = dict(
+            learning_rate=8e-4, aux_learning_rate=3e-4, desired_kl=0.045, max_lr=8e-4,
+            max_grad_norm=5.0, entropy_coef=0.003,
+        )
+        self.assertEqual({name: train["algorithm"][name] for name in shared_algorithm}, shared_algorithm)
         self.assertEqual(ann_train, dict(
             train,
             policy=dict(base_train["policy"], method="himloco", max_action_std=0.55),
             estimator=base_train["estimator"],
-            algorithm=dict(base_train["algorithm"], learning_rate=8e-4, aux_learning_rate=3e-4,
-                           desired_kl=0.045, max_lr=8e-4, max_grad_norm=5.0, entropy_coef=0.002),
+            algorithm=dict(base_train["algorithm"], **shared_algorithm),
         ))
 
     def test_parkour_strict_inherits_layout_and_changes_only_three_scales(self):
