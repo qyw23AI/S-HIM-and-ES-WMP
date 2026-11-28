@@ -150,7 +150,7 @@ else
         torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0
     "${uv[@]}" -c "$constraints" --extra-index-url https://pypi.nvidia.com 'isaacsim[all,extscache]==5.1.0'
     "${uv[@]}" -c "$constraints" 'setuptools>=68,<81' wheel toml \
-        numpy==1.26.0 scipy==1.15.3 tensorboard trimesh matplotlib
+        numpy==1.26.0 scipy==1.15.3 h5py PyYAML websockets psutil tensorboard trimesh matplotlib
 fi
 # Rebind editables to the current machine paths even after restoring an archive.
 if ! "${uv[@]}" "${lab_options[@]}" --no-build-isolation -e "$lab_source"; then
