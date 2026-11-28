@@ -24,19 +24,18 @@ case ${preset#smoke-} in
     L2) name=L2_shim_spike_diag_4096; method=s-him; readout=spike ;;
 esac
 
-total=5000
-checkpoint_interval=250
-diagnostics_interval=10
+task=s_him_a1_stair
+total=
+smoke_args=()
 if [[ $preset == smoke-* ]]; then
     name=smoke-$name
     total=5
-    checkpoint_interval=0
-    diagnostics_interval=1
+    smoke_args+=(--checkpoint-interval 0 --diagnostics-interval 1)
 fi
 out="$repo/runs/s-him-long/$name"
 sync_dir=
 sync_interval=300
-seed=1
+seed=
 resume=0
 dry_run=0
 while (($#)); do
@@ -57,8 +56,8 @@ while (($#)); do
         *) die "Unknown launcher option: $1 (pass training arguments after --)" ;;
     esac
 done
-[[ $total =~ ^(0|[1-9][0-9]*)$ ]] || die "--total-iterations must be a nonnegative integer"
-[[ $seed =~ ^[0-9]+$ ]] || die "--seed must be a nonnegative integer"
+[[ -z $total || $total =~ ^(0|[1-9][0-9]*)$ ]] || die "--total-iterations must be a nonnegative integer"
+[[ -z $seed || $seed =~ ^[0-9]+$ ]] || die "--seed must be a nonnegative integer"
 [[ $sync_interval =~ ^[1-9][0-9]*$ ]] || die "--sync-interval must be a positive integer"
 out=$(realpath -m -- "$out")
 if [[ -n $sync_dir ]]; then
@@ -91,7 +90,18 @@ fi
 # Keep the environment's Python symlink intact.
 [[ $python == /* ]] || python="$PWD/$python"
 cd -- "$repo"
-export ACCEPT_EULA=Y OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1
+export ACCEPT_EULA=Y OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+if [[ -z $total ]]; then
+    total=$("$python" - "$task" <<'PYTHON'
+import sys
+
+from graduation.legacy import load_config
+
+_, training = load_config(sys.argv[1])
+print(training["runner"]["max_iterations"])
+PYTHON
+    )
+fi
 
 shopt -s nullglob
 copy_files() {
@@ -217,23 +227,13 @@ if ((remaining == 0)); then
     exit 0
 fi
 
-cmd=("$python" scripts/bench_blind.py "$method"
-     --num-envs 4096 --steps 100 --seed "$seed" --iterations "$remaining"
-     --terrain stairs --reward-preset snn-stair
-     --learning-rate 8e-4 --lr-schedule adaptive --desired-kl 0.045 --max-lr 8e-4
-     --max-grad-norm 5.0 --entropy-coef 0.002 --max-action-std 0.55
-     --diagnostics-interval "$diagnostics_interval" --checkpoint-interval "$checkpoint_interval"
-     --amp --amp-motion-set a1_diagonal --amp-reward-coef 0.4 --amp-task-lerp 0.0
-     --amp-discr-lr 1e-4 --amp-discr-updates 4 --amp-batch-size 1024
-     --amp-replay-size 1000000 --amp-preload 200000 --amp-discr-widths 1024 512
-     --headless --out "$out")
+cmd=("$python" scripts/bench_blind.py "$method" --task "$task"
+     --iterations "$remaining" --headless --out "$out" "${smoke_args[@]}")
+if [[ -n $seed ]]; then
+    cmd+=(--seed "$seed")
+fi
 if [[ $method == s-him ]]; then
-    cmd+=(--paper-training --estimator grsn --normalization care
-          --actor-type lif --actor-norm none --actor-readout-mode "$readout"
-          --actor-surrogate rect --actor-threshold 0.5 --ticks 8 --actor-widths 256 128
-          --aux-learning-rate 3e-4 --separate-grad-clip --log-std-lr-scale 0.05
-          --actor-weight-decay 1e-4 --freeze-aux-estimator-stats
-          --balanced-calibration --ppo-rollout-features --calibration-interval 5)
+    cmd+=(--actor-readout-mode "$readout")
 fi
 if [[ ${DISABLE_KIT_DRIVER_BYPASS:-0} != 1 ]]; then
     cmd+=(--kit_args=--/rtx/verifyDriverVersion/enabled=false)
@@ -310,6 +310,7 @@ logger=$!
 # Give the trainer its own process group so wrappers such as Isaac Sim's python.sh
 # and their Python children both receive the stop signal.
 set -m
+run_marker=$(mktemp "$out/.shim-run-start.XXXXXX")
 "${cmd[@]}" >&"$log_fd" 2>&1 &
 trainer=$!
 set +m
@@ -317,4 +318,10 @@ exec {log_fd}>&-
 status=0
 wait "$trainer" || status=$?
 trainer=
+if ((status == 139)) && [[ -f $out/validation.json && $out/validation.json -nt $run_marker ]] &&
+    grep -q '"status": *"passed"' "$out/validation.json" 2>/dev/null; then
+    printf 'Note: SimulationApp.close() exited with 139 after validation.json passed; treating run as successful.\n' >&2
+    status=0
+fi
+rm -f -- "$run_marker"
 exit "$status"

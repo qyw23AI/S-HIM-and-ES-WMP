@@ -43,9 +43,27 @@ archive=${ENV_ARCHIVE:-}
 if [[ -n $archive ]]; then
     archive=$(realpath -m -- "$archive")
 fi
-export ACCEPT_EULA=Y OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1
+export ACCEPT_EULA=Y OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1 MPLBACKEND=Agg
 
 [[ $(uname -s) == Linux && $(uname -m) == x86_64 ]] || die "This setup targets Linux x86_64."
+
+# On root/Colab containers, ensure libGLU/Vulkan loader and NVIDIA ICD JSON are registered if available.
+if [[ $EUID -eq 0 ]]; then
+    if command -v apt-get >/dev/null 2>&1 && [[ ! -f /usr/lib/x86_64-linux-gnu/libGLU.so.1 ]]; then
+        apt-get update -qq && apt-get install -y -qq libglu1-mesa libvulkan1 libegl1 >/dev/null 2>&1 || true
+    fi
+    if [[ ! -f /etc/vulkan/icd.d/nvidia_icd.json ]]; then
+        for nv_lib in /usr/lib64-nvidia/libGLX_nvidia.so.0 /usr/local/nvidia/lib64/libGLX_nvidia.so.0 \
+                      /usr/lib/x86_64-linux-gnu/libGLX_nvidia.so.0 /usr/lib64-nvidia/libEGL_nvidia.so.0; do
+            if [[ -f $nv_lib ]]; then
+                mkdir -p /etc/vulkan/icd.d /usr/share/vulkan/icd.d
+                printf '{"file_format_version":"1.0.0","ICD":{"library_path":"%s","api_version":"1.3"}}\n' \
+                    "$nv_lib" > /etc/vulkan/icd.d/nvidia_icd.json
+                break
+            fi
+        done
+    fi
+fi
 
 mkdir -p -- "$MAMBA_ROOT_PREFIX/envs"
 scratch=$(mktemp -d "$MAMBA_ROOT_PREFIX/.shim-setup.XXXXXX")
