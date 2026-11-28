@@ -175,6 +175,11 @@ if ! "${uv[@]}" "${lab_options[@]}" --no-build-isolation -e "$lab_source"; then
     "$python" -m pip install "${lab_options[@]}" --no-build-isolation -e "$lab_source"
 fi
 "${uv[@]}" --no-deps --no-build-isolation -e "$migration"
+# Ensure the lightweight AMP_for_hardware submodule (needed by a1_diagonal_omni motion set) is initialized.
+if [[ -d $repo/.git && ! -f $repo/third_party/upstream/AMP_for_hardware/datasets/mocap_motions/leftturn0.txt ]]; then
+    git -C "$repo" submodule update --init --depth 1 third_party/upstream/AMP_for_hardware || true
+fi
+
 rm -rf -- "$migration/.cache/a1"
 
 "$python" - <<'PY'
